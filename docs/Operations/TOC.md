@@ -1,8 +1,10 @@
+# Hyperledger Composer Operations Guide
 - [Introduction](./introduction.md)
 - [Hyperledger Composer Security Model](./idsandparts.md)
 - [Connection Profiles](./connectionprofiles.md)
 - [Business network cards](./busnetcards.md)
 - [NetworkAdmin Participant type](./networkadmin.md)
+- Need to note about identity activation
 - [Deploying business networks](./deploy.md)
 - [Upgrading business networks](./upgrade.md)
 - [Managing identities and participants](./managingids.md)
@@ -13,5 +15,5 @@
 - [startBusinessNetwork transaction](./tbd.md)
 - [Hyperledger Composer docker images](./tbd.md)
 - [Hyperledger Composer Rest Server](./tbd.md)
-- [Client Connectivity wrt network reliability](./tbd.md)
+- [Client connectivity and network reliability handling](./tbd.md)
 - [Hardware Security Module (HSM) support](./tbd.md)

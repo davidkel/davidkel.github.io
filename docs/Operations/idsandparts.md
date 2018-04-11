@@ -1,4 +1,4 @@
-## [TOC](./TOC.md)
+### [TOC](./TOC.md)
 ### [Back](./introduction.md)
 
 # The Hyperledger Composer Security Model
@@ -46,7 +46,7 @@ asset Identity identified by identityId {
     --> Participant participant
 }
 ```
-The important point to note here is that an Identity is identifier by the identityId **Not** the name (the name being the Common Name of the certificate). This means that you have many identities, all with the same `name` but they are not the same identity.
+The important point to note here is that an Identity is identifier by the identityId **NOT** the name (the name being the Common Name of the certificate). This means that you have many identities, all with the same `name` but they are not the same identity.
 
 When a request from a client comes into the business network the composer runtime will first obtain the public certificate of the identity making the request from fabric. It then extracts the `public key` from the certificate and creates a unique identitifer from that public key. This identitier is used to find the Identity asset in the registry and must match an entry with the same `identityId` value. If it doesn't find one you get a message similar to this one.
 ```
@@ -54,4 +54,7 @@ Error: The current identity, with the name 'admin' and the identifier 'ea173e6aa
 ```
 Even if the certificate has the same `name`, the public key of that certificate did not match the one that has been registered and so they are not the same identity.
 
-### [Next](./tbd.md)
+## Identity State
+TBD
+
+### [Next - Connection Profiles](./connectionprofiles.md)
