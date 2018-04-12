@@ -84,6 +84,10 @@ This is the version of the connection profile document. Currently the only suppo
 ### x-committimeout
 This is another property used exclusively by Hyperledger Composer. Any property starting with `x-` is seen as a application specific extension. This is the timeout in seconds that Composer will wait for a transaction to commit before returning control back to the calling client program by throwing an error.
 
+### grpcOptions
+
+### httpOptions
+
 ### x-hsm
 This is another Hyperledger Composer specific extension but will be discussed in the [HSM Chapter](./hsm.md)
 

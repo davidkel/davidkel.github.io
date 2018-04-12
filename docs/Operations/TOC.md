@@ -3,17 +3,25 @@
 - [Hyperledger Composer Security Model](./idsandparts.md)
 - [Connection Profiles](./connectionprofiles.md)
 - [Business network cards](./busnetcards.md)
-- [NetworkAdmin Participant type](./networkadmin.md)
-- Need to note about identity activation
-- [Deploying business networks](./deploy.md)
-- [Upgrading business networks](./upgrade.md)
-- [Managing identities and participants](./managingids.md)
-- [ACLs for operations](./acls.md)
-- [using fabric-ca-client](./fabric-ca-client.md)
-- [using an alternative certificate provider](./tbd.md)
-- [fabric-ca-server](./tbd.md)
-- [startBusinessNetwork transaction](./tbd.md)
-- [Hyperledger Composer docker images](./tbd.md)
-- [Hyperledger Composer Rest Server](./tbd.md)
-- [Client connectivity and network reliability handling](./tbd.md)
+- [Network Admin participant type](./networkadmin.md)
+- [Deploying business networks- TBD](./deploy.md)
+- [Upgrading business networks- TBD](./upgrade.md)
+- [Managing identities and participants - TBD](./managingids.md)
+- [ACLs for operations - TBD](./acls.md)
+- [Cloud Wallets - TBD](./cloud-wallets.md)
+- [using fabric-ca-client - TBD](./fabric-ca-client.md)
+- [using an alternative certificate provider - TBD](./tbd.md)
+- [fabric-ca-server - TBD](./tbd.md)
+- [startBusinessNetwork transaction - TBD](./tbd.md)
+- [Hyperledger Composer docker images - TBD](./tbd.md)
+- [Hyperledger Composer Rest Server - TBD](./tbd.md)
+- [Client connectivity and network reliability handling - TBD](./tbd.md)
 - [Hardware Security Module (HSM) support](./tbd.md)
+
+
+
+- Things that need to be included
+  - Need to note about identity activation
+  - No ACL file means unrestricted access for all.
+  - Too many acl rules will impact performance
+
