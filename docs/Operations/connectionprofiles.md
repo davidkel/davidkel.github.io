@@ -40,7 +40,7 @@ Currently using the `pem` option is the only safe way to ensure your connection 
 awk 'NF {sub(/\r/, ""); printf "%s\\n",$0;}' YOUR_PEM_FILE > text_to_paste.txt
 ```
 
-will write a file called text_to_paste.txt which will contain the correct format for a JSON document. 
+will write a file called text_to_paste.txt which will contain the correct format for a JSON document.
 
 ## Connection Profiles can be in JSON or YAML format.
 Not documented on the Composer website, but the `composer card create` will allow for a connection profile to be specified in `json` or `yaml` format. Hyperledger Fabric document the YAML format whereas the Composer documentation document the JSON format. 
@@ -70,6 +70,9 @@ By default if you don't specify a role then the role is assumed to be true. In t
 For a peer to have the role of `endorsingPeer` or `chaincodeQuery`, a business network must have been installed on that peer.
 
 What makes this feature useful is the ability for Organisations to decide which peers they send endorsements to, qhich peers they want to query and which peers to use as an event source. A Peer may be capable of all those roles, but from a client interaction perspective you may wish to be selective about which peers you interact with (more details later about how clients connect and interact with nodes)
+
+## Channels
+The connection profile specification allows for the definition of multiple channels in the connection profile. Composer does not support multiple channels. You should only ever define a single channel in your connection profile.
 
 ## Other connection profile properties
 

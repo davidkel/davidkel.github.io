@@ -4,10 +4,10 @@
 - [Connection Profiles](./connectionprofiles.md)
 - [Business network cards](./busnetcards.md)
 - [Network Admin participant type](./networkadmin.md)
-- [Deploying business networks- TBD](./deploy.md)
+- [Deploying business networks](./deploy.md)
 - [Upgrading business networks- TBD](./upgrade.md)
 - [Managing identities and participants - TBD](./managingids.md)
-- [ACLs for operations - TBD](./acls.md)
+- [ACLs for operations](./acls.md)
 - [Cloud Wallets - TBD](./cloud-wallets.md)
 - [using fabric-ca-client - TBD](./fabric-ca-client.md)
 - [using an alternative certificate provider - TBD](./tbd.md)
@@ -24,4 +24,6 @@
   - Need to note about identity activation
   - No ACL file means unrestricted access for all.
   - Too many acl rules will impact performance
+  - client version mismatch with runtime version
+  - version migration ????
 
