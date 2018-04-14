@@ -87,6 +87,7 @@ if your package.json already has the composer-* dependencies then these will not
 This will start the fabric instantiation of the business network chaincode
 
 - talk about providing an endorsement policy
+- CORE_CHAINCODE_STARTUPTIMEOUT
 
 
 ## Using the Peer Commands

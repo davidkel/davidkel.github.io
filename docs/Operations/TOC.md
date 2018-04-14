@@ -26,4 +26,10 @@
   - client version mismatch with runtime version
   - version migration ????
   - commands that create cards for you and the issues there
+  - CORE_CHAINCODE_EXECUTETIMEOUT
+  - CORE_VM_DOCKER_ATTACHSTDOUT
+  - CORE_CHAINCODE_LOGGING
+  - CORE_PEER_LOGGING
+  - orderer logging
+  - ca server logging
 
