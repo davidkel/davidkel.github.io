@@ -1,5 +1,6 @@
 ### [TOC](./TOC.md)
 
+### [Back - Managing identities and participants](./managingids.md)
 
 #ACls
 
@@ -194,3 +195,9 @@ rule NetworkAdminCreateIssueIdentityTx {
 // need to add bind and revoke
 // Need to add historian access.
 ```
+
+## to be included
+  - No ACL file means unrestricted access for all.
+  - Too many acl rules will impact performance
+
+### [Next - Cloud Wallets](./cloud-wallets.md)

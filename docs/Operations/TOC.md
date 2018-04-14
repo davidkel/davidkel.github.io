@@ -6,11 +6,10 @@
 - [Network Admin participant type](./networkadmin.md)
 - [Fabric CA - TBD](./fabric-ca.md)
 - [Deploying business networks](./deploy.md)
-- [Upgrading business networks- TBD](./upgrade.md)
-- [Managing identities and participants - TBD](./managingids.md)
+- [Upgrading business networks](./upgrade.md)
+- [Managing identities and participants](./managingids.md)
 - [ACLs for operations](./acls.md)
 - [Cloud Wallets - TBD](./cloud-wallets.md)
-- [using fabric-ca-client - TBD](./fabric-ca-client.md)
 - [Hyperledger Composer docker images - TBD](./tbd.md)
 - [Hyperledger Composer Rest Server - TBD](./tbd.md)
 - [Client connectivity and network reliability handling - TBD](./tbd.md)
@@ -21,8 +20,7 @@
 
 - Things that need to be included
   - Need to note about identity activation
-  - No ACL file means unrestricted access for all.
-  - Too many acl rules will impact performance
+
   - client version mismatch with runtime version
   - version migration ????
   - commands that create cards for you and the issues there
@@ -32,4 +30,13 @@
   - CORE_PEER_LOGGING
   - orderer logging
   - ca server logging
+  - include fabric-ca-client in managing identities and participants
+  - upgrade should include endorsement policies
+  - cloud wallets
+    - wallet to hold sensitive info such as cards, connector info eg fabric keystore for keys & certs
+    - can share a wallet through filesystem sharing, remote server
+    - danger with fabric-ca admin if you store card with a secret, if 2 people use it at the same time, 2 enrollments can occur
+  - fabric-ca-client with tls issues
+
+
 
