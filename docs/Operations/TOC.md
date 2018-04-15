@@ -4,7 +4,7 @@
 - [Connection Profiles](./connectionprofiles.md)
 - [Business network cards](./busnetcards.md)
 - [Network Admin participant type](./networkadmin.md)
-- [Fabric CA - TBD](./fabric-ca.md)
+- [Fabric CA](./fabric-ca.md)
 - [Deploying business networks](./deploy.md)
 - [Upgrading business networks](./upgrade.md)
 - [Managing identities and participants](./managingids.md)
@@ -13,30 +13,46 @@
 - [Hyperledger Composer docker images - TBD](./tbd.md)
 - [Hyperledger Composer Rest Server - TBD](./tbd.md)
 - [Client connectivity and network reliability handling - TBD](./tbd.md)
-- [Hardware Security Module (HSM) support](./tbd.md)
-- [using an alternative certificate provider - TBD](./tbd.md)
+- [Diagnostics - TBD](./tbd.md)
+- [Hardware Security Module (HSM) support - TBD](./tbd.md)
 - [startBusinessNetwork transaction - TBD](./tbd.md)
-
+- [using an alternative certificate provider - TBD](./tbd.md)
 
 - Things that need to be included
-  - Need to note about identity activation
-
-  - client version mismatch with runtime version
-  - version migration ????
-  - commands that create cards for you and the issues there
-  - CORE_CHAINCODE_EXECUTETIMEOUT
-  - CORE_VM_DOCKER_ATTACHSTDOUT
-  - CORE_CHAINCODE_LOGGING
-  - CORE_PEER_LOGGING
-  - orderer logging
-  - ca server logging
-  - include fabric-ca-client in managing identities and participants
-  - upgrade should include endorsement policies
+  - Misc
+     - Need to note about identity activation
+     - client version mismatch with runtime version
+     - version migration ????
+     - commands that create cards for you and the issues there
+     - CORE_CHAINCODE_EXECUTETIMEOUT
+     - fabric-ca-client with tls issues     
+  - Docker Images
+     - No included diagnostic tools
+     - removed ability to install anything else security
+     - based on alpine
+     - issues if you copy binaries to it
+     - CLI, Playground, Rest Server
+     - why you might not want to use the images as is
+     - PM2 is used to try to ensure reliability
+  - Rest Server
+     - discovery id used for system activities and bn parsing
+     - it only uses the cloud wallet
+     - explorer and how to disable
+     - examples of identity management using it
+     - Multi-user and authentication go hand in hand
+     - uploaded cards are not stored in the cloud wallet
+     - in-memory and mongodb
+  - Diagnostics
+     - CORE_VM_DOCKER_ATTACHSTDOUT
+     - CORE_CHAINCODE_LOGGING
+     - CORE_PEER_LOGGING
+     - orderer logging
+     - ca server logging
   - cloud wallets
     - wallet to hold sensitive info such as cards, connector info eg fabric keystore for keys & certs
     - can share a wallet through filesystem sharing, remote server
     - danger with fabric-ca admin if you store card with a secret, if 2 people use it at the same time, 2 enrollments can occur
-  - fabric-ca-client with tls issues
+
 
 
 

@@ -1,5 +1,5 @@
 ### [TOC](./TOC.md)
-### [Back](./introduction.md)
+### [Back - Introduction](./introduction.md)
 
 # The Hyperledger Composer Security Model
 In Hyperledger Composer there are 2 important distinctions that need to be made, the first is what is an identity and the second is how does this relate to a participant

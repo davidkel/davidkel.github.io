@@ -1,5 +1,5 @@
 ### [TOC](./TOC.md)
-### [Back - Identities and Participants](./idsandparts.md)
+### [Back - The Hyperledger Composer security model](./idsandparts.md)
 
 # Connection Profiles
 Connection profiles are a fundamental part of a business network card (see later). The purpose of a connection profile is to describe the components that make up a Hyperledger Fabric Network. They describe
