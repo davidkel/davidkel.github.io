@@ -1,6 +1,8 @@
-# Using Windows 10
-Hyperledger Composer doesn't officially support windows for developing business networks or for doing any operational aspects such as deployment or identity management. However it's perfectly doable and on Windows you have so much choice on how to do it, it's entirely up to you.
-Also this solution presented here, works with Windows Home, Professional and Enterprise. It doesn't require any special features in a specific Windows version.
+# **UNDER CONSTRUCTION STILL**
+
+# Using Windows
+Hyperledger Composer doesn't officially support windows for developing business networks, client applications (including playground and rest-server) or for doing any operational aspects such as deployment or identity management. However it's perfectly doable and on Windows you have a choice on how to do it, it's entirely up to you.
+Also this solution presented here, works with Windows Home, Professional and Enterprise. It doesn't require any special features in a specific Windows version. It will also work with windows 7 but you need to use the native solution as Windows Subsystem for Linux is not available prior to windows 10. This solution won't work if you are running windows in a VM. Virtual box (used here) doesn't support nested virtualisation.
 
 ## Business Network Development
 You don't need a real fabric for the most part, you can use composer playground to develop your business network. Either use the [online playground](https://composer-playground.mybluemix.net) which doesn't require any installation at all (Just remember to export your BNA as it is all held in the local storage of your browser) or install it locally (see later about installing to composer) and just use the web browser profile. This allows you to develop and test a lot of the features of a business network but currently can't do the following
@@ -13,37 +15,49 @@ Obviously you would write unit tests for your client simulating connecting to a 
 ### Using a real fabric for development
 Composer has no dependency on the architecture of a fabric network. It doesn't matter if it is single org, multiple org, 1 peer per org, 2 peers per org etc. All it needs is a connection profile describing the network (see composer document on connection profiles) with an appropriately configured client section to specify which org you are representing and optional timeouts. From there you can build cards containing appropriate credentials that allow access to the fabric network. From a developer point of view then it doesn't matter what the fabric network looks like, all we need is a fabric network, an appropriate connection profile and credentials. Or even better a pre-built composer business network card which provides an identity that has admin priviledges on the peer and the defined channel.
 
-It's not so straight forward getting hyperledger fabric working well on windows. Hyperledger fabric do document using git bash as a command shell in order to run the various scripts and you can make it work, but it can be a problem to get it working. Not least because at the end of the day, Hyperledger fabric from dockerhub are linux containers so still require a virtual machine running a full distribution of linux in order to run these images.
+#### Hyperledger Fabric recommends git bash
+It's not so straight forward getting hyperledger fabric working well on windows. Hyperledger fabric do document using git bash as a command shell in order to run the various scripts and you can make it work, but it can be a problem to get it working. It does require docker for windows (not docker toolbox) which means it will only work on Windows 10 professional or enterprise.
+Other people have been able to follow the hyperledger composer tutorial as well by modifying the docker-compose.yaml file and using git bash, if you prefer you can go down this route however the purpose of Hyperledger Composer is not to help you build fabric networks (you should be looking at Hyperledger Ledger Fabric documentation to do that) but how to develop Hyperledger Composer applications which are independent of a hyperledger fabric network but will help you create a connection profile used by hyperledger composer to connect to a specific network setup. So having a pre-working built network without the fuss seems to be a good approach.
 
 #### Installation guide
 This will install a version of the composer-tools package, `fabric-dev-servers` which is identical to the one described in the single org tutorial.
 
 1. Install [VirtualBox Version 5](https://www.virtualbox.org/wiki/Downloads)
 2. Install [Vagrant](https://www.vagrantup.com/downloads.html) Version 1.9 or higher
-3. create a directory called singleorg-blockchain
+3. create a directory called fabric-network
 4. download the [FabricDevServer.zip](https://raw.githubusercontent.com/davidkel/ComposerVagrant/master/FabricDevServer/zipped/FabricDevServer.zip) file
-5. unpack the zip file into your new singleorg-blockchain directory
+5. unpack the zip file into your new fabric-network directory
 6. change to that directory in a command prompt window
 7. run the command `vagrant up` in the current directory to bring up the fabric-network for the first time
-8. Note the file `PeerAdmin@singleorg-blockchain.card` in your current directory that gets created once the environment has finished starting up the fabric.
+8. Note the file `PeerAdmin@fabric-network.card` in your current directory that gets created once the environment has finished starting up the fabric.
 
 ```
 c:\Users\Dave\fabric-network> vagrant up
 ...
 c:\Users\Dave\fabric-network> dir
 ...
-PeerAdmin@singleorg-blockchain.card
+PeerAdmin@fabric-network.card
 ```
 
+9. It also provides you will a connection profile and the credentials for the peer and channel administrator (this fabric setup makes them both the same identity). If you wish to build the card yourself, you will find the connection profile in the your `fabric-network` directory called `fabric-network-connection.json` and the sub-directory `admin` has the credentials for Admin@org1.example.com identity copied there for easy access.
+
 #### Available commands
+There are some useful commands when using `vagrant`. You can also use the commands available in composer tools (to an extent). Make sure you always run these commands from your `fabric-network` directory.
 
 | Command | description |
 | ------- | ----------- |
 | vagrant up | start up the fabric network |
 | vagrant halt | to shutdown the fabric network |
-| vagrant ssh -c 'docker ps' | invoke commands such as docker ps or docker logs |
+| vagrant ssh -c 'docker ps' | invoke docker ps |
+| vagrant ssh -c 'docker logs <container_name> | get the logs of a fabric node container |
 | vagrant ssh -c 'teardownFabric.sh' | invoke the fabric tools commands |
 | vagrant destroy | completely shutdown and remove the virtual machine |
+| vagrant ssh | connect the the virtual machine and start a bash shell |
+
+#### Single Org Tutorial differences
+- Step One: You don't need to perform this step.
+- Step Two: You could perform this step but you would have to use `vagrant ssh` to get a shell into the virtual machine where the fabric-network is running.
+- Step Four/Step Five: The certificate and private key can be found in the `admin` subdirectory. 
 
 ## Installing the Composer applications
 Choose which environment you prefer
@@ -138,9 +152,11 @@ Files owned by windows can be accessed, eg for files on the C drive you find the
 Yes this is possible
 1. install nvm-windows from [nvm-windows releases](https://github.com/coreybutler/nvm-windows/releases)
 2. use nvm to install node 8 
+
 ```
 nvm install 8
 ```
+
 3. install the windows tools using `npm install -g windows-build-tools`
 4. install git from [git for windows](https://gitforwindows.org/)
 5. ensure you have the following configured
@@ -154,4 +170,4 @@ git config --global core.longpaths true
 Just follow the standard instructions for installing composer
 
 ## Developing business networks and client applications
-I recommend using [Visual Studio Code](https://code.visualstudio.com/). If you do use WSL for development (and I would recommend this over using the native windows option), then you can find your files in the WSL shell under the initial path of `/mnt/c` for the Windows C drive, for example `/mnt/c/Users/dave/myfirstbna`.
+I recommend using [Visual Studio Code](https://code.visualstudio.com/). If you do use WSL for development (and I would recommend this over using the native windows option), then you can find your files in the WSL shell under the initial path of `/mnt/c` for the Windows C drive, for example `/mnt/c/Users/dave/myfirstbna` if I had created my bna fille in `c:\Users\dave\myfirstbna`.

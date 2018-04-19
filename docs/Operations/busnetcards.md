@@ -17,7 +17,6 @@ TBD
 ## Card Files vs Cards
 Discussion and documentation around business network cards use the term card for 2 different things so it's time to be clear. A card lives in a card store, A card file is a `COPY` of a card put into a file. A card file allows you to transport copies of cards to other systems outside of using a shared card store (to be discussed later). 
 
-
 ## Secret Cards and Card Files
 There are 2 types of Card
 
@@ -43,8 +42,10 @@ The recommended practice is
 4. Now it is safe to export the card and share it as required.
 
 ### Business Network Cards that don't represent a business network and roles
+
 **TBD**
 
+#### Roles in a business network card
 A Business network card can have roles associated with it, you will see the option in `composer card create` to apply roles to cards. You only need to apply roles to cards if you plan to use the cards in `Composer Playground`. Also you only can add roles to cards that do not define a business network. These are the special cards you would create as described above. 
 
 The following roles are available

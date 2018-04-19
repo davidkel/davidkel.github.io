@@ -42,6 +42,8 @@
      - Multi-user and authentication go hand in hand
      - uploaded cards are not stored in the cloud wallet
      - in-memory and mongodb
+     - The REST server can be configured to authenticate clients. When this option is enabled, clients must authenticate to the REST server before they are permitted to call the REST API.
+     - Mult-user: By default, the Hyperledger Composer REST server services all requests by using the Blockchain identity specified on the command line at startup. requires authentication setup.
   - Diagnostics
      - CORE_VM_DOCKER_ATTACHSTDOUT
      - CORE_CHAINCODE_LOGGING
