@@ -15,9 +15,21 @@ Obviously you would write unit tests for your client simulating connecting to a 
 ### Using a real fabric for development
 Composer has no dependency on the architecture of a fabric network. It doesn't matter if it is single org, multiple org, 1 peer per org, 2 peers per org etc. All it needs is a connection profile describing the network (see composer document on connection profiles) with an appropriately configured client section to specify which org you are representing and optional timeouts. From there you can build cards containing appropriate credentials that allow access to the fabric network. From a developer point of view then it doesn't matter what the fabric network looks like, all we need is a fabric network, an appropriate connection profile and credentials. Or even better a pre-built composer business network card which provides an identity that has admin priviledges on the peer and the defined channel.
 
-#### Hyperledger Fabric recommends git bash
+#### Hyperledger Fabric recommends git bash (msys, cygwin are similar)
 It's not so straight forward getting hyperledger fabric working well on windows. Hyperledger fabric do document using git bash as a command shell in order to run the various scripts and you can make it work, but it can be a problem to get it working. It does require docker for windows (not docker toolbox) which means it will only work on Windows 10 professional or enterprise.
 Other people have been able to follow the hyperledger composer tutorial as well by modifying the docker-compose.yaml file and using git bash, if you prefer you can go down this route however the purpose of Hyperledger Composer is not to help you build fabric networks (you should be looking at Hyperledger Ledger Fabric documentation to do that) but how to develop Hyperledger Composer applications which are independent of a hyperledger fabric network but will help you create a connection profile used by hyperledger composer to connect to a specific network setup. So having a pre-working built network without the fuss seems to be a good approach.
+If you do then the minimum that apparently is required is
+
+- Windows 10 professional or enterprise
+- Hyper-v enabled
+- Docker for Windows
+- Cygwin, git bash or msys
+
+```
+export  COMPOSE_CONVERT_WINDOWS_PATHS=1
+export  MSYS_NO_PATHCONV=1
+```
+to ensure all works with docker-compose and docker.
 
 #### Installation guide
 This will install a version of the composer-tools package, `fabric-dev-servers` which is identical to the one described in the single org tutorial.
