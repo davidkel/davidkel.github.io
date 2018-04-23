@@ -28,7 +28,7 @@
      - fabric-ca-client with tls issues     
   - Docker Images
      - No included diagnostic tools
-     - removed ability to install anything else security
+     - removed ability to install anything else for security reasons
      - based on alpine
      - issues if you copy binaries to it
      - CLI, Playground, Rest Server
@@ -44,6 +44,7 @@
      - in-memory and mongodb
      - The REST server can be configured to authenticate clients. When this option is enabled, clients must authenticate to the REST server before they are permitted to call the REST API.
      - Mult-user: By default, the Hyperledger Composer REST server services all requests by using the Blockchain identity specified on the command line at startup. requires authentication setup.
+     - APIKey
   - Diagnostics
      - CORE_VM_DOCKER_ATTACHSTDOUT
      - CORE_CHAINCODE_LOGGING
