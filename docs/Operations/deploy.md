@@ -97,13 +97,31 @@ The command also provides control over
 - binding initial identities to participants to provide access to the business network
 
 #### Endorsement policy
-TBD
+The start command and the upgrade command is where you declare your endorsement policy. The format of the endorsement policy is dictated by the fabric node-sdk. It isn't owned by Hyperledger composer, a link to some form of documentation is [here](https://fabric-sdk-node.github.io/global.html#ChaincodeInstantiateUpgradeRequest)
+
+Rather than re-iterate the Composer documentation about how to specify an endorsement policy on the start command see [here](
+https://hyperledger.github.io/composer/latest/managing/connector-information#hyperledger-fabric-endorsement-policies)
+
+
 #### identity binding
-TBD
+When you start your business network for the first time, you MUST have at least 1 participant defined which has been bound to an identity. The start command provides this ability and can also create multiple bound participants. You do this using the `-A` combined with the `-S` or `-C` options on the command line. In this instance the Participant type used by the start command is the inbuilt one `NetworkAdmin`. The definition of NetworkAdmin 
+
+The value for `-A` is used to define `participantId` that the NetworkAdmin participant, and will be stored as the username in the created business network card. 
+
+If you specify `-S` then the secret is stored in the business network card and that card will need to enroll using the username and secret in the card to get it's private key and certificate. Therefore the name you specify on the -A must have been registered with the Fabric CA Server previously. This is the way most of the composer documentation and the single org tutorial demonstrate. The identity is registered in the composer runtime as `ISSUED` as described in [The Hyperledger Composer Security Model](./idsandparts.md) section and will need to be activated. **Remember that cards with just secrets in are single use only, you should only import it into one card store, ping it and delete the original card file.**
+
+If you specify `-C` then that identity is registered in the composer runtime as `BOUND` as described in [The Hyperledger Composer Security Model](./idsandparts.md) section and will need to be activated. The certificate is stored in the business network card, however unless you are using a HSM to manage your private keys, this means that the created business network card is actually not valid. There is no way to also include the private key, so the best thing to do is delete the card and use `composer card create` to create the card yourself.
+
+As mentioned you can perform multiple bindings on a single start request, eg
+```
+composer network start -n my-busnet -V 0.0.1 -c admin@fabric -A admin@org1 -C certorg1.pem -A admin@org2 -C certorg2.pem
+```
+
+I would not recommend the `-S` option when working with production fabric networks. It's a nice convenient option when doing development say on a single org fabric. In the above example for example you want to bind identities from 2 different organisations so the -S option would not work as they are unlikely to be registered to the same fabric ca server, more likely they will have registered to their own fabric ca server or even a 3rd party CA.
 
 
 ## Using the Peer Commands
-TBD (needs research to see how this would be possible)
+TBD (needs research to see how this would be possible, install should be but start will be a problem due to the need to perform a startBusinessNetwork transaction which get's passed as an argument to the start fabric request)
 
 
 ### [Next - Upgrading Business Networks](./upgrade.md)

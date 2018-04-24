@@ -54,7 +54,7 @@ Error: The current identity, with the name 'admin' and the identifier 'ea173e6aa
 ```
 Even if the certificate has the same `name`, the public key of that certificate did not match the one that has been registered and so they are not the same identity.
 
-## Identity State
+## Identity State and Activation
 TBD
 
 ### [Next - Connection Profiles](./connectionprofiles.md)

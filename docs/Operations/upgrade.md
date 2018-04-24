@@ -3,6 +3,10 @@
 ### [Back - Deploying Business Networks](./deploy.md)
 
 
+# Upgrading business networks
+
+
+
 - include info about endorsement policies
 - must install chaincode first
 - can upgrade to any installed chaincode even if it is a previous version

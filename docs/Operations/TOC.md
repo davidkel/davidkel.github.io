@@ -20,7 +20,6 @@
 
 - Things that need to be included
   - Misc
-     - Need to note about identity activation
      - client version mismatch with runtime version
      - version migration ????
      - commands that create cards for you and the issues there

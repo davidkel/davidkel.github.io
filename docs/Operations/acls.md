@@ -206,6 +206,6 @@ rule NetworkAdminParticipantAccess {
 }
 ```
 
-Ideally it would be good if IssueIdentity, BindIdentity, RevokeIdentity all inherited from an IdentityTransaction, then we could collapse 3 rules into 1 and also include ActivateCurrentIdentity as well, but unfortunately that isn't how the system model is designed currently.
+Ideally it would be have been good if IssueIdentity, BindIdentity, RevokeIdentity all inherited from an IdentityTransaction, then we could collapse 3 rules into 1 and also include ActivateCurrentIdentity as well, but unfortunately that isn't how the system model is designed currently.
 
 ### [Next - Cloud Wallets](./cloud-wallets.md)
