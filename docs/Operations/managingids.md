@@ -9,6 +9,7 @@
 - Identity issue and the 2 priviledges it requires
 - fabric-ca-client
 - composer identity request
+- composer identity issue
 - composer participant add
 - composer identity bind
 - composer identity list

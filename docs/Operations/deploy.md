@@ -29,6 +29,13 @@ An aspect of the Node.js support in Fabric 1.1 that is often not realised is tha
 4. It creates a chaincode container from this image
 5. It starts the business network using `npm start`
 
+This can take time, you may need to increase the startup timeout of fabric in order to accommodate for this. If you use docker compose to bring up your hyperledger fabric network you can set a env value on the peers to increase this timeout
+
+```
+CORE_CHAINCODE_STARTUPTIMEOUT=1200s
+``` 
+the example above increases the timeout to 20 minutes.
+
 ## Using the Composer CLI commands
 Composer provides 2 commands to assist in deploying. We used to provide a single command for this purpose (`deploy`) but it would not be flexible enough to handle the needs of a fabric network, for example it could not handle 2 different organisations need to install the business network, or if the admin ids for installing chaincode onto peers were different from the admin id needed to start a business network on a channel. For this reason `deploy` was dropped leaving the 2 commands to perform the different stages of getting a business network up and running.
 
@@ -84,15 +91,19 @@ Then the install process will put this version of the package.json onto the peer
 if your package.json already has the composer-* dependencies then these will not be overwritten. This is useful if you want to control the versions yourself outside of the version of the composer-cli you have installed
 
 ### composer network start
-This will start the fabric instantiation of the business network chaincode
+This will start the fabric instantiation of the business network chaincode as described [here](./deploy.md#fabric-1.1-node.js-chaincode) so again you can expect this to take a while and may need the startup timeout increased if you have a slow network or constrained resources.
+The command also provides control over 
+- defining your endorsement policy for the business network
+- binding initial identities to participants to provide access to the business network
 
-- talk about providing an endorsement policy
-- CORE_CHAINCODE_STARTUPTIMEOUT
+#### Endorsement policy
+TBD
+#### identity binding
+TBD
 
 
 ## Using the Peer Commands
-TBD (needs research)
-
+TBD (needs research to see how this would be possible)
 
 
 ### [Next - Upgrading Business Networks](./upgrade.md)

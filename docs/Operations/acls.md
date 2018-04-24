@@ -2,11 +2,14 @@
 
 ### [Back - Managing identities and participants](./managingids.md)
 
-#ACls
-
+#ACLs
 ACL's are not only used to provide access control for business interactions, they also provided access control for operational aspects as well. Unfortunately at this time there is only a single ACL file so no easy way to seperate the needs and requirements of administrators to that of the business network itself and will be the role of the business network developer to develop the administrator controls as well.
 
-For the most part, it's likely for operational aspects that the resources to be under control with be those in `org.hyperledger.composer.system.cto`
+Some useful things to know about ACL and ACL files
+
+- if no ACL file is provided, then every participant can do anything, there are no controls in place.
+- The higher the number of ACL rules the more this will impact performance as both submitted transactions perform checks as well as query requests against all resources touched.
+
 ## resources in system.cto
 For the most part, it's likely for operational aspects that the resources to be under control with be those in `org.hyperledger.composer.system.cto` file found in `composer-common/lib/system`. Here is a summary of those resources and meaning. For brevity the `org.hyperledger.composer.system` namespace have been removed.
 
@@ -20,9 +23,9 @@ For the most part, it's likely for operational aspects that the resources to be 
 | Transaction (abstract)| Any type of transaction|
 | Event (abstract)| Any type of Event |
 | Registry (abstract)| Any type of registry |
-| AssetRegistry | An Registry registry, will create an AssetRegistry registry and it will hold a list of all the Asset Types in both system and Business network|
-| ParticipantRegistry | A Participant Registry registry, will create a ParticipantRegistry registry and it will hold a list of all the Participant Types in both system and Business network|
-| TransactionRegistry | A TransactionRegistry registry. will create a TransactionRegistry regsitry and it will hold a list of all the Transaction Types in both system and Business network|
+| AssetRegistry | An Asset Registry registry, will create an AssetRegistry registry and it will hold a list of all the Asset Registries in both system and Business network|
+| ParticipantRegistry | A Participant Registry registry, will create a ParticipantRegistry registry and it will hold a list of all the Participant Registries in both system and Business network|
+| TransactionRegistry | A TransactionRegistry registry. will create a TransactionRegistry registry and it will hold a list of all the Transaction Registries in both system and Business network|
 | Network | type of Asset that represents a business network will also have a Network registry to hold instances |
 | NetworkAdmin | type of Participant, will also have a NetworkAdmin registry to hold instances|
 | HistorianRecord | type of Asset , will also have a HistorianRecord registry to hold instances|
@@ -45,7 +48,7 @@ For the most part, it's likely for operational aspects that the resources to be 
 | SetLogLevel | type of transaction, will also have a transaction registry to hold instances of it |
 
 ## Rules
-The following sections provide some guidance on the rules, however you should consider that as the number of ACL rules grows, performance will be reduced. So you might want to consider using more generic types rather than specific types. Another approach could be to define `DENY` rules followed by a rule that allows everything in the system namespace. ACL rules a processed top to botton so the deny rules will be actioned first.
+The following sections provide some guidance on the rules, however you should consider that as the number of ACL rules grows, performance will be reduced. So you might want to consider using more generic types rather than specific types. Another approach could be to define `DENY` rules followed by a rule that allows everything in the system namespace. ACL rules are processed top to botton so the deny rules will be actioned first.
 ### Rules that everyone should have
 There are going to be some rules that everyone (including participants transacting on the business network) need to be able to do anything on the business network.
 
@@ -58,31 +61,47 @@ There are going to be some rules that everyone (including participants transacti
 ### Rules to permit the creation/reading/updating/deleting of any participant
 
 | resource | operation | description        |
+| -------- | --------- | ------------       |
 | ParticipantRegistry | READ | Need this to see all the participant registries |
-| TransactionRegistry#AddParticipant | READ | Allows you to read the registry for system transactions, you need this to be able to get the system transaction you want to create |
-| AddParticipant | CREATE, READ | Allows you to create the AddParticipant transaction object, read access so you can see it in historian |
+| TransactionRegistry#AddParticipant | READ | Required to be able to access the AddParticipant Transaction Registry |
+| AddParticipant | ALL | Allows you to create/update/delete/read the AddParticipant transaction object, read access so you can see it in historian |
 | Participant | CREATE, READ | Allows you to create any (system or otherwise) type of Participant Type, and then be able to see that it was created |
-| TransactionRegistry#UpdateParticipant | READ | |
+| TransactionRegistry#UpdateParticipant | READ | Required to be able to access the UpdateParticipant Transaction Registry|
 | UpdateParticipant | CREATE, READ | Allows you to create and read later in historian the UpdateParticipant transaction object |
-| Participant | CREATE, READ, UPDATE, DELETE | Allows you to create any (system or otherwise) Participant Type, and then be able to see that it was created and then update the participant |
-
+| TransactionRegistry#RemoveParticipant | READ | Required to be able to access the RemoveParticipant Transaction Registry|
+| RemoveParticipant | CREATE, READ | Allows you to create and read later in historian the RemoveParticipant transaction object |
 
 ### Rules to be able to associate identities with a partipant
 It's assumed that you will have already granted some sort of read access to the Participant type.
 
+| resource | operation | description        |
+| -------- | --------- | ------------       |
 | AssetRegistry#Identity | READ | Ability to view the identity registry |
 | Identity | CREATE, READ | Read is required to read the list of identities, CREATE is required to create a new Identity asset |
-| TransactionRegistry#IssueIdentity | READ | Need to be able to read the system transaction IssueIdentity |
+| TransactionRegistry#IssueIdentity | READ | Need to be able to access the transaction registry IssueIdentity |
 | IssueIdentity | CREATE, READ | Need to be able to create the system transaction IssueIdentity, read so that can view historian record |
 
+(repeat the IssueIdentity definitions, for BindIdentity, RevokeIdentity, ActivateCurrentIdentity, StartBusinessNetwork)
 
 ### example ACL file putting it all together
-This example assumes that you are using the NetworkAdmin participant type for all Business Network administration. ie, they can create all types of participant, they an issue or bind identities to a participant. They can revoke identities, finally the ability to only see those specifics in the Historian. This example shows all the rules required but may not be the most efficient way. But it ensures the network admin can only do what they are allowed to do. 
+Here's an example of an ACL that provides a network administrator with the following capabilities
+- Able to create/update/delete any participant type
+- Able to perform identity management
+- Able to view all the historian records, but can only see the contents of records related to network admin activities
 
-(TBD is there a better rule set to achieve the same thing ?)
+Also considered here is how to achieve what is needed with a few rules as possible, without using conditions.
+
+it assumes that you are using the NetworkAdmin participant type for all Business Network administration.
+
+it's important to note that inheritance only works on the type and not the specific instance, for example this would not work
+resource: "org.hyperledger.composer.system.TransactionRegistry#org.hyperledger.composer.system.ParticipantTransaction"
+
+to refer to AddParticipant, UpdateParticipant, RemoveParticipant transactions stored in the org.hyperledger.composer.system.TransactionRegistry
+
+but you could replace `org.hyperledger.composer.system.TransactionRegistry` with `org.hyperledger.composer.system.Registry` and that would work.
 
 ```
-AllCanReadBusinessNetwork {
+rule AllCanReadBusinessNetwork {
     description: "Must be able to read the business network to be able to do anything on a business network connection as it gets a business network"
     participant: "ANY"
     operation: READ
@@ -90,114 +109,103 @@ AllCanReadBusinessNetwork {
     action: ALLOW
 }
 
-AllCanReadHistorianRecordStructure {
-    description: "Everyone who will manipulate an asset, participant or submit a transaction will need to be able to read the Historian Asset definition. "
+rule AllCanReadHistorianRegistry {
+    description: "Everyone who will manipulate an asset, participant or submit a transaction will need to be able to read the Historian Transaction Registry"
     participant: "ANY"
     operation: READ
     resource: "org.hyperledger.composer.system.AssetRegistry#org.hyperledger.composer.system.HistorianRecord"
     action: ALLOW
 }
 
-AllCanCreateHistorianRecord {
-    description: "Everyone who will manipulate an asset, participant or submit a transaction will need to be able to create a Historian Record"
+rule AllCanCreateAndReadHistorianRecord {
+    description: "Everyone who will manipulate an asset, participant or submit a transaction will need to be able to create a Historian Record, Let everyone be able to read it as well"
     participant: "ANY"
-    operation: CREATE
+    operation: CREATE, READ
     resource: "org.hyperledger.composer.system.HistorianRecord"
     action: ALLOW
 }
 
-rule NetworkAdminParticipantRegistryAccess {
-    description: "Network admin can see all the available Participant Registries"
-    participant: "org.hyperledger.composer.system.NetworkAdmin"
-    operation: READ
-    resource: "org.hyperledger.composer.system.ParticipantRegistry"
-    action: ALLOW
-}
-
-rule NetworkAdminAddParticipant {
-    description: "Network admin can read the AddParticipant Transaction structure"
-    participant: "org.hyperledger.composer.system.NetworkAdmin"
-    operation: READ
-    resource: "org.hyperledger.composer.system.TransactionRegistry#org.hyperledger.composer.system.AddParticipant"
-    action: ALLOW
-}
-
-rule NetworkAdminAddParticipant2 {
-    description: "Allows Network admin to create the AddParticipant transaction object, read access so you can see it in historian"
-    participant: "org.hyperledger.composer.system.NetworkAdmin"
-    operation: CREATE, READ
-    resource: "org.hyperledger.composer.system.AddParticipant"
-    action: ALLOW
-}
-
-rule NetworkAdminManageParticipant {
-    description: "Allows Network admin to create, update or delete any (system or otherwise) type of Participant Type, and then be able to see that it was created"
-    participant: "org.hyperledger.composer.system.NetworkAdmin"
-    operation: ALL
-    resource: "org.hyperledger.composer.system.Participant"
-    action: ALLOW
-}
-
-rule NetworkAdminUpdateParticipant {
-    description: "Allows network admin to read the Update Participant system transaction"
-    participant: "org.hyperledger.composer.system.NetworkAdmin"
-    operation: READ
-    resource: "org.hyperledger.composer.system.TransactionRegistry#org.hyperledger.composer.system.UpdateParticipant"
-    action: ALLOW
-}
-
-rule NetworkAdminUpdateParticipant2 {
-    description: "Allows you to create and read later in historian the UpdateParticipant transaction object"
-    participant: "org.hyperledger.composer.system.NetworkAdmin"
-    operation: CREATE, READ
-    resource: "org.hyperledger.composer.system.UpdateParticipant"
-    action: ALLOW
-}
-
-// add Delete Participant
-// org.hyperledger.composer.system.TransactionRegistry#org.hyperledger.composer.system.RemoveParticipant
-
 rule NetworkAdminIdentityRegistryAccess {
-    description: "Ability to view the identity registry"
+    description: "Network admin can access the identity asset registry"
     participant: "org.hyperledger.composer.system.NetworkAdmin"
     operation: READ
     resource: "org.hyperledger.composer.system.AssetRegistry#org.hyperledger.composer.system.Identity"
     action: ALLOW
 }
 
-rule NetworkAdminIdentityAssetsAccess {
-    description: "Read is required to read the list of identities, CREATE is required to create a new identity"
+rule NetworkAdminNoAssetRegistryAccess {
+    description: "Deny the Network Admin access to any of the Asset Registries"
+    participant: "org.hyperledger.composer.system.NetworkAdmin"
+    operation: READ
+    resource: "org.hyperledger.composer.system.AssetRegistry"
+    action: DENY
+}
+
+rule NetworkAdminRegistryAccess {
+    description: "Network admin can see all the available Participant Registries, and Transaction Registries, but not asset registries, except identity, as dictated above"
+    participant: "org.hyperledger.composer.system.NetworkAdmin"
+    operation: READ
+    resource: "org.hyperledger.composer.system.Registry"
+    action: ALLOW
+}
+
+rule NetworkAdminManageParticipant {
+    description: "Allows Network admin to create, update or delete any type of Participant Type, and then be able to see read the Participants"
+    participant: "org.hyperledger.composer.system.NetworkAdmin"
+    operation: ALL
+    resource: "org.hyperledger.composer.system.Participant"
+    action: ALLOW
+}
+
+rule NetworkAdminIdentityAccess {
+    description: "Allow a Network Admin to create an identity and read created identities"
     participant: "org.hyperledger.composer.system.NetworkAdmin"
     operation: CREATE, READ
     resource: "org.hyperledger.composer.system.Identity"
     action: ALLOW
 }
 
-Ability to Issue an Identity
-----------------------------
 rule NetworkAdminIssueIdentityAccess {
-    description: "Need to be able to read the system transaction IssueIdentity"
-    participant: "org.hyperledger.composer.system.NetworkAdmin"
-    operation: READ
-    resource: "org.hyperledger.composer.system.TransactionRegistry#org.hyperledger.composer.system.IssueIdentity"
-    action: ALLOW
-}
-
-rule NetworkAdminCreateIssueIdentityTx {
-    description: "Need to be able to create the system transaction IssueIdentity, read so that can view historian record"
+    description: "Allows Network admin to create an instance of an issue identity transaction, read access so the details can be seen"
     participant: "org.hyperledger.composer.system.NetworkAdmin"
     operation: CREATE, READ
     resource: "org.hyperledger.composer.system.IssueIdentity"
     action: ALLOW
 }
 
+rule NetworkAdminBindIdentityAccess {
+    description: "Allows Network admin to create any instance of an bind identity transaction, read access so the details can be seen"
+    participant: "org.hyperledger.composer.system.NetworkAdmin"
+    operation: CREATE, READ
+    resource: "org.hyperledger.composer.system.BindIdentity"
+    action: ALLOW
+}
 
-// need to add bind and revoke
-// Need to add historian access.
+rule NetworkAdminRevokeIdentityAccess {
+    description: "Allows Network admin to create any instance of an bind identity transaction, read access so the details can be seen"
+    participant: "org.hyperledger.composer.system.NetworkAdmin"
+    operation: CREATE, READ
+    resource: "org.hyperledger.composer.system.RevokeIdentity"
+    action: ALLOW
+}
+
+rule NetworkAdminStartBusinessNetworkAccess {
+    description: "Allows Network admin to create any instance of an bind identity transaction, read access so the details can be seen"
+    participant: "org.hyperledger.composer.system.NetworkAdmin"
+    operation: CREATE, READ
+    resource: "org.hyperledger.composer.system.StartBusinessNetwork"
+    action: ALLOW
+}
+
+rule NetworkAdminParticipantAccess {
+    description: "Allows Network admin to create an add/update/remove participant, read access so the details can be seen"
+    participant: "org.hyperledger.composer.system.NetworkAdmin"
+    operation: CREATE, READ
+    resource: "org.hyperledger.composer.system.ParticipantTransaction"
+    action: ALLOW
+}
 ```
 
-## to be included
-  - No ACL file means unrestricted access for all.
-  - Too many acl rules will impact performance
+Ideally it would be good if IssueIdentity, BindIdentity, RevokeIdentity all inherited from an IdentityTransaction, then we could collapse 3 rules into 1 and also include ActivateCurrentIdentity as well, but unfortunately that isn't how the system model is designed currently.
 
 ### [Next - Cloud Wallets](./cloud-wallets.md)
