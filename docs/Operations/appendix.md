@@ -1,0 +1,39 @@
+### [TOC](./TOC.md)
+
+# List of thoughts I still need to include somewhere
+- Things that need to be included
+  - Misc
+     - version migration ????
+     - commands that create cards for you and the issues there
+     - fabric-ca-client with tls issues     
+  - Docker Images
+     - No included diagnostic tools
+     - removed ability to install anything else for security reasons
+     - based on alpine
+     - issues if you copy binaries to it
+     - CLI, Playground, Rest Server
+     - why you might not want to use the images as is
+     - PM2 is used to try to ensure reliability
+  - Rest Server
+     - discovery id used for system activities and bn parsing
+     - it only uses the cloud wallet
+     - explorer and how to disable
+     - examples of identity management using it
+     - Multi-user and authentication go hand in hand
+     - uploaded cards are not stored in the cloud wallet
+     - in-memory and mongodb
+     - The REST server can be configured to authenticate clients. When this option is enabled, clients must authenticate to the REST server before they are permitted to call the REST API.
+     - Mult-user: By default, the Hyperledger Composer REST server services all requests by using the Blockchain identity specified on the command line at startup. requires authentication setup.
+     - APIKey
+  - Diagnostics
+     - CORE_VM_DOCKER_ATTACHSTDOUT
+     - CORE_CHAINCODE_LOGGING
+     - CORE_PEER_LOGGING
+     - CORE_CHAINCODE_EXECUTETIMEOUT     
+     - orderer logging
+     - ca server logging
+     - client version mismatch with runtime version     
+  - cloud wallets
+    - wallet to hold sensitive info such as cards, connector info eg fabric keystore for keys & certs
+    - can share a wallet through filesystem sharing, remote server
+    - danger with fabric-ca admin if you store card with a secret, if 2 people use it at the same time, 2 enrollments can occur
