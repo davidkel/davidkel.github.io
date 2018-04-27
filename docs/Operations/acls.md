@@ -2,7 +2,7 @@
 
 ### [Back - Managing identities and participants](./managingids.md)
 
-#ACLs
+# ACLs
 ACL's are not only used to provide access control for business interactions, they also provided access control for operational aspects as well. Unfortunately at this time there is only a single ACL file so no easy way to seperate the needs and requirements of administrators to that of the business network itself and will be the role of the business network developer to develop the administrator controls as well.
 
 Some useful things to know about ACL and ACL files

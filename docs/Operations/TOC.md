@@ -18,4 +18,3 @@
 - [startBusinessNetwork transaction - TBD](./tbd.md)
 - [using an alternative certificate provider - TBD](./tbd.md)
 - [Appendix - Stuff that still needs to be included](./appendix.md)
-

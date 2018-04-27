@@ -74,10 +74,10 @@ There are some useful commands when using `vagrant`. You can also use the comman
 ## Installing the Composer applications
 Choose which environment you prefer
 
-1. Windows Subsystem For Linux
+1. Windows Subsystem For Linux (Windows 10 only)
 2. Native Windows
 
-### Setting Windows Subsystem for Linux (WSL)
+### Using Windows Subsystem for Linux (WSL)
 A great feature of windows is the ability to run native linux compiled binaries on windows (with exceptions, you couldn't get the docker daemon running in it for example). Even better is that you can install complete distributions that work the same way as a real linux distribution, such as ubuntu. I recommend the ubuntu distribution. You will need to check what version of Windows 10 you are using then follow appropriate instructions to install the windows subsystem for linux for that level of windows.
 
 Once done, you can run this simple script to install other pre-reqs
@@ -161,17 +161,13 @@ Files owned by windows can be accessed, eg for files on the C drive you find the
 
 
 ### Using Native Windows.
-Yes this is possible
-1. install nvm-windows from [nvm-windows releases](https://github.com/coreybutler/nvm-windows/releases)
-2. use nvm to install node 8 
+Yes this is possible currently, however there is no guarantee this will continue to work and if it does break, because windows is not officially supported there will be no focus to fix it. This is different from the Windows Subsystem For Linux as the likelyhood is that if it works for linux then it will work in the Windows Subsystem for Linux.
 
-```
-nvm install 8
-```
-
+1. download and install node 8 for windows from [node.js](https://nodejs.org/en/download/)
+2. Open an administrative powershell window
 3. install the windows tools using `npm install -g windows-build-tools`
-4. install git from [git for windows](https://gitforwindows.org/)
-5. ensure you have the following configured
+3. install git from [git for windows](https://gitforwindows.org/)
+4. ensure you have the following configured
 
 ```
 git config --global core.autocrlf false
@@ -179,7 +175,11 @@ git config --global core.longpaths true
 ```
 
 ### Installing Composer
-Just follow the standard instructions for installing composer
+Either open a Windows subsystem for linux bash shell (if using the subsystem), or a standard command prompt (if using native) and then just follow the standard instructions for installing composer
 
 ## Developing business networks and client applications
 I recommend using [Visual Studio Code](https://code.visualstudio.com/). If you do use WSL for development (and I would recommend this over using the native windows option), then you can find your files in the WSL shell under the initial path of `/mnt/c` for the Windows C drive, for example `/mnt/c/Users/dave/myfirstbna` if I had created my bna fille in `c:\Users\dave\myfirstbna`.
+
+## And finally....
+Want to try out the Hyperledger Composer Multiple Organisation Tutorial on Windows ?  Follow this [link to the next section](./multiorg.md)
+

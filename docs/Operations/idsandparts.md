@@ -25,7 +25,7 @@ Public certificates contain something called a `Common Name`. Because of the exa
 The entity wishing to access the hyperledger fabric network must have access to their associated identity's private key whenever they want to interact with a fabric network. This private key is used to sign all interactions.
 
 ## How Hyperledger Composer maps from Identities to Participants
-(Insert Diagram here)
+TBD: (Insert Diagram here)
 
 The Hyperledger Composer runtime that forms part of the business network deployment creates and maintains an `identity registry`. It uses this to map the _identity's public certificate_ that has been presented to the Hyperledger Fabric by the Hyperledger Composer client application, Playground or Rest Server (we will talk about how these components do that later in the book) to an associated Participant.
 Given that statement the following can be inferred

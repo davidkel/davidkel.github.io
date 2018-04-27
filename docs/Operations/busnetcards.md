@@ -2,7 +2,7 @@
 ### [Back - Connection Profiles](./connectionprofiles.md)
 
 # Business network cards
-(insert diagram)
+TBD:(insert diagram)
 
 TBD
 - Amalgomation of 2 things
@@ -23,8 +23,10 @@ There are 2 types of Card
 - One that has a certificate and optionally a private key (you won't have a private key if your card is able to interact with an HSM. HSMs are covered later in this book)
 - One that has only a secret stored in the metadata of the card.
 
+But let me make a recommendation now, **Don't use Cards with Secrets for production**. Cards with secrets cause more confusion about how security works than anything else around the Hyperledger Composer security model. Avoiding using secrets may seem impossible, but as you read through this book I hope that the alternatives will become more clear.
+
 ### So why is it important to know about the difference ?
-(Insert diagram here)
+TBD:(Insert diagram here)
 A card that only has a secret means it **CANNOT** interact with a business network. As you recall in order to be able to access a Hyperledger Fabric network, even before you try to interact with a business network you require a public certificate and a private key. However Hyperledger Composer  deals with this on your behalf. It will take the username and secret in that card, create a private key, register the username with the fabric-ca-server defined in the connection profile, and then request a public certificate from the fabric-ca-server. The fabric-ca-server will also record that username and explicitly reject any further requests to request a certificate for that user again. It reports this as an `Authorization Failure`. 
 Now the card has been converted to one that contains a certificate and private key and that card can interact with a business network. This is all done under the covers.
 
@@ -57,9 +59,5 @@ The following roles are available
 
 In both the case of the composer sample fabric server and fabric samples themselves the channel admin's are usually the admins for the peers in the network.
 
-
-
-### further reading
-TBD: The fabric-ca-server bootstrap id is a different id that needs to be covered 
 
 ### [Next - NetworkAdmin Participant Type](./networkadmin.md)
