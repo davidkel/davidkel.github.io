@@ -5,17 +5,13 @@ Hyperledger Composer doesn't officially support windows for developing business 
 Also this solution presented here, works with Windows Home, Professional and Enterprise. It doesn't require any special features in a specific Windows version. It will also work with windows 7 but you need to use the native solution as Windows Subsystem for Linux is not available prior to windows 10. This solution won't work if you are running windows in a VM. Virtual box (used here) doesn't support nested virtualisation.
 
 ## Business Network Development
-You don't need a real fabric for the most part, you can use composer playground to develop your business network. Either use the [online playground](https://composer-playground.mybluemix.net) which doesn't require any installation at all (Just remember to export your BNA as it is all held in the local storage of your browser) or install it locally (see later about installing to composer) and just use the web browser profile. This allows you to develop and test a lot of the features of a business network but currently can't do the following
-
-1. Test predefined queries
-2. Test client code connected to the business network
-
-Obviously you would write unit tests for your client simulating connecting to a business network using the embedded connector. 
+You don't need a real fabric for the most part, you can use composer playground to develop your business network. Either use the [online playground](https://composer-playground.mybluemix.net) which doesn't require any installation at all (Just remember to export your BNA as it is all held in the local storage of your browser) or install it locally (see later about installing to composer) and just use the web browser profile. This allows you to develop and test a lot of the features of a business network, but to test other aspects such as client code or the rest server still requires a real fabric.
 
 ### Using a real fabric for development
 Composer has no dependency on the architecture of a fabric network. It doesn't matter if it is single org, multiple org, 1 peer per org, 2 peers per org etc. All it needs is a connection profile describing the network (see composer document on connection profiles) with an appropriately configured client section to specify which org you are representing and optional timeouts. From there you can build cards containing appropriate credentials that allow access to the fabric network. From a developer point of view then it doesn't matter what the fabric network looks like, all we need is a fabric network, an appropriate connection profile and credentials. Or even better a pre-built composer business network card which provides an identity that has admin priviledges on the peer and the defined channel.
 
 #### Hyperledger Fabric recommends git bash (msys, cygwin are similar)
+**Warning: This is untested**
 It's not so straight forward getting hyperledger fabric working well on windows. Hyperledger fabric do document using git bash as a command shell in order to run the various scripts and you can make it work, but it can be a problem to get it working. It does require docker for windows (not docker toolbox) which means it will only work on Windows 10 professional or enterprise.
 Other people have been able to follow the hyperledger composer tutorial as well by modifying the docker-compose.yaml file and using git bash, if you prefer you can go down this route however the purpose of Hyperledger Composer is not to help you build fabric networks (you should be looking at Hyperledger Ledger Fabric documentation to do that) but how to develop Hyperledger Composer applications which are independent of a hyperledger fabric network but will help you create a connection profile used by hyperledger composer to connect to a specific network setup. So having a pre-working built network without the fuss seems to be a good approach.
 If you do then the minimum that apparently is required is
@@ -25,6 +21,7 @@ If you do then the minimum that apparently is required is
 - Docker for Windows
 - Cygwin, git bash or msys
 
+In order to be able to get a hyperledger fabric environment up and running you need to issue the following commands
 ```
 export  COMPOSE_CONVERT_WINDOWS_PATHS=1
 export  MSYS_NO_PATHCONV=1
@@ -51,7 +48,7 @@ c:\Users\Dave\fabric-network> dir
 PeerAdmin@fabric-network.card
 ```
 
-9. It also provides you will a connection profile and the credentials for the peer and channel administrator (this fabric setup makes them both the same identity). If you wish to build the card yourself, you will find the connection profile in the your `fabric-network` directory called `fabric-network-connection.json` and the sub-directory `admin` has the credentials for Admin@org1.example.com identity copied there for easy access.
+9. It also provides you with a connection profile and the credentials for the peer and channel administrator (this fabric setup makes them both the same identity). If you wish to build the card yourself, you will find the connection profile in the your `fabric-network` directory called `fabric-network-connection.json` and the sub-directory `admin` has the credentials for Admin@org1.example.com identity copied there for easy access.
 
 #### Available commands
 There are some useful commands when using `vagrant`. You can also use the commands available in composer tools (to an extent). Make sure you always run these commands from your `fabric-network` directory.
