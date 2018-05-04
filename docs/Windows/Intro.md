@@ -1,5 +1,3 @@
-# **UNDER CONSTRUCTION STILL**
-
 # Using Windows
 Hyperledger Composer doesn't officially support windows for developing business networks, client applications (including playground and rest-server) or for doing any operational aspects such as deployment or identity management. However it's perfectly doable and on Windows you have a choice on how to do it, it's entirely up to you.
 Also this solution presented here, works with Windows Home, Professional and Enterprise. It doesn't require any special features in a specific Windows version. It will also work with windows 7 but you need to use the native solution as Windows Subsystem for Linux is not available prior to windows 10. This solution won't work if you are running windows in a VM. Virtual box (used here) doesn't support nested virtualisation.

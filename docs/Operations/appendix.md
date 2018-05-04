@@ -4,8 +4,7 @@
 - Things that need to be included
   - Misc
      - version migration ????
-     - commands that create cards for you and the issues there
-     - fabric-ca-client with tls issues     
+     - commands that create cards for you and the issues there   
   - Docker Images
      - No included diagnostic tools
      - removed ability to install anything else for security reasons

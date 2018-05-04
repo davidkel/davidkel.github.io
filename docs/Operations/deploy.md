@@ -31,6 +31,9 @@ An aspect of the Node.js support in Fabric 1.1 that is often not realised is tha
 
 This can take time, you may need to increase the startup timeout of fabric in order to accommodate for this. If you use docker compose to bring up your hyperledger fabric network you can set a env value on the peers to increase this timeout
 
+TBD: info about how fabric decides if an image needs to be built (ie if the image already exists from a previous start - most likely see in dev environments only)
+
+
 ```
 CORE_CHAINCODE_STARTUPTIMEOUT=1200s
 ``` 
