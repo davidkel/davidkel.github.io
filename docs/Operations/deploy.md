@@ -15,12 +15,30 @@ For this reason in 0.19 and beyond, the stanza is this. **Your business network 
 1. The business network is now the first class citizen. It controls all the dependencies
 2. The business network is now deployed in the same way as all other hyperledger fabric chaincode. This means in theory that you don't have to use composer commands to install, start or upgrade a business network. It should be perfectly possible to use the other fabric capabilities such as the SDKs, Peer Commands or other providers facilities to deploy chaincode. In this respect you would not create a business network archive or use a business network archive, but just the indidivual files in a directory similar to a standard node.js package.
 
+## Deploying = Install + Start
 deploying business networks requires 2 steps
 
 1. Each organisation need to install the same version of business network onto all endorsing and chaincode querying peers that they own (see connection profiles for what peers belong to which organisation and their roles in the channel).
 2. Once all organisations have done this, a trusted 3rd party or agreed representitive from one of the organisations needs to start that business network.
 
-## Fabric 1.1 Node.js Chaincode
+### Business network cards required to deploy
+Every Peer in an organisation has the concept of an administrator whose identity will be represented by a public certificate and private key. In order to install the business network onto a peer, you will need a business network card to represent that identity so that you can install a business network onto that peer. The likeyhood will be that the identity defined for that is the same for all peers in the same organisation but will be different for other organisations. So each organisation will need their own business network cards to provide the ability to install the business network on their peers. If my organisation was called `org1`, a connection profile that describes the network with a client section specific to my organisation called `fabric-network-org1.json`  and I have the Peer identity information of cert.pem and 123456_sk, then I might create a card file as follows
+
+```
+composer card create -f admin@org1.card -u admin@org1 -c cert.pem -k 123456_sk -p  fabric-network-org1.json
+```
+
+The example above defines a card file which can be imported to provide the ability to install business network onto the peers. But it doesn't necessarily mean you have permission to start the network. That requires Channel Admin authority and it is dependent on how the channel has been set up. The confusion comes from the fact that the hyperledger composer dev-server package as well as byfn tutorials all set up a fabric network channel where the admins for the peers (in all organisations) are also admins for the channel, however that doesn't have to be the case, it could be a totally different identity.
+
+A card therefore is also required to start the business network. Let's assume that this identity isn't any of the Peer admins for any of the organisations, so again I need the identity in the form of a certificate and private key and let's assume these are in channeladmincert.pem and 573786_sk. 
+So the command to create a card file would be
+
+```
+composer card create -f admin@consortium.card -u admin@consortium -c channeladmincert.pem -k 573786_sk -p fabric-network-org1.json
+```
+You notice that the profile selected to include in this card is from a specific organisation. It must match the mspid of the identity that is being used to start the business network. In the above case it is assumed that the one of the defined channel admins has an identity which is in the same MSP as Org1, so we use the org1 profile. There can be more than 1 channel admin, so you could have an admin from each org, or you could have an admin from none of those organisations in which case it would require a profile specific to that 3rd party, but that 3rd party isn't permitted to transact on the network.
+
+## How Fabric 1.1 instantiates Node.js Chaincode
 An aspect of the Node.js support in Fabric 1.1 that is often not realised is that when it is instantiated (`start` is the terminology used by Composer) the following process takes place
 
 1. fabric creates a Container from the ccenv image
@@ -46,9 +64,9 @@ Composer provides 2 commands to assist in deploying. We used to provide a single
 
 examples
 ```
-composer network install -c FabricAdmin@consortium -a b2b-network.bna
+composer network install -c admin@org1 -a b2b-network.bna
 
-composer network install -c FabricAdmin@consortium -a b2b-network.bna -o npmrcFile=/tmp/npmConfig.txt
+composer network install -c admin@org1 -a b2b-network.bna -o npmrcFile=/tmp/npmConfig.txt
 ```
 
 This command will install a business network onto all the peers listed in the channel that are part of your organisation (ie the organisation you have declared in your client section in your connection profile). It will not install to peers in organisations other than that. This makes sense, you would usually only have the admin rights to perform the install on peers your organisation owns. You wouldn't have the right to do it on peers you don't own.
@@ -99,12 +117,13 @@ The command also provides control over
 - defining your endorsement policy for the business network
 - binding initial identities to participants to provide access to the business network
 
+**IMPORTANT: You can only ever start a business network once. Once started a start command will not work and all you can do from then on is upgrade.**
+
 #### Endorsement policy
 The start command and the upgrade command is where you declare your endorsement policy. The format of the endorsement policy is dictated by the fabric node-sdk. It isn't owned by Hyperledger composer, a link to some form of documentation is [here](https://fabric-sdk-node.github.io/global.html#ChaincodeInstantiateUpgradeRequest)
 
 Rather than re-iterate the Composer documentation about how to specify an endorsement policy on the start command see [here](
 https://hyperledger.github.io/composer/latest/managing/connector-information#hyperledger-fabric-endorsement-policies)
-
 
 #### identity binding
 When you start your business network for the first time, you MUST have at least 1 participant defined which has been bound to an identity. The start command provides this ability and can also create multiple bound participants. You do this using the `-A` combined with the `-S` or `-C` options on the command line. In this instance the Participant type used by the start command is the inbuilt one `NetworkAdmin`. The definition of NetworkAdmin 
@@ -117,11 +136,10 @@ If you specify `-C` then that identity is registered in the composer runtime as 
 
 As mentioned you can perform multiple bindings on a single start request, eg
 ```
-composer network start -n my-busnet -V 0.0.1 -c admin@fabric -A admin@org1 -C certorg1.pem -A admin@org2 -C certorg2.pem
+composer network start -n my-busnet -V 0.0.1 -c admin@consortium -A admin@org1 -C certorg1.pem -A admin@org2 -C certorg2.pem
 ```
 
 I would not recommend the `-S` option when working with production fabric networks. It's a nice convenient option when doing development say on a single org fabric. In the above example for example you want to bind identities from 2 different organisations so the -S option would not work as they are unlikely to be registered to the same fabric ca server, more likely they will have registered to their own fabric ca server or even a 3rd party CA.
-
 
 ## Using the Peer Commands
 TBD (needs research to see how this would be possible, install should be but start will be a problem due to the need to perform a startBusinessNetwork transaction which get's passed as an argument to the start fabric request)

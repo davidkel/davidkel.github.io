@@ -28,10 +28,13 @@
      - CORE_VM_DOCKER_ATTACHSTDOUT
      - CORE_CHAINCODE_LOGGING
      - CORE_PEER_LOGGING
-     - CORE_CHAINCODE_EXECUTETIMEOUT     
+     - CORE_CHAINCODE_EXECUTETIMEOUT
+     - CORE_CHAINCODE_STARTUPTIMEOUT
      - orderer logging
      - ca server logging
-     - client version mismatch with runtime version     
+     - client version mismatch with runtime version
+     - chaincode image fails to build, takes to long to build
+     - chaincode fails to register with peer.
   - cloud wallets
     - wallet to hold sensitive info such as cards, connector info eg fabric keystore for keys & certs
     - can share a wallet through filesystem sharing, remote server
