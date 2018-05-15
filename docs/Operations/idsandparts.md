@@ -25,7 +25,7 @@ Public certificates contain something called a `Common Name`. Because of the exa
 The entity wishing to access the hyperledger fabric network must have access to their associated identity's private key whenever they want to interact with a fabric network. This private key is used to sign all interactions.
 
 ## How Hyperledger Composer maps from Identities to Participants
-TBD: (Insert Diagram here)
+TBD: (Insert Diagram here showing how identities are mapped to participants)
 
 The Hyperledger Composer runtime that forms part of the business network deployment creates and maintains an `identity registry`. It uses this to map the _identity's public certificate_ that has been presented to the Hyperledger Fabric by the Hyperledger Composer client application, Playground or Rest Server (we will talk about how these components do that later in the book) to an associated Participant.
 Given that statement the following can be inferred
@@ -55,6 +55,30 @@ Error: The current identity, with the name 'admin' and the identifier 'ea173e6aa
 Even if the certificate has the same `name`, the public key of that certificate did not match the one that has been registered and so they are not the same identity.
 
 ## Identity State and Activation
-TBD
+The identity registry maintains a state for that identity. An Identity can be in one of the following states
+
+| state | description |
+| ------| -------- |
+| ISSUED | The identity was registered through an identity issue request, no certificate has been stored for the identity |
+| BOUND | The identity was registered throufh an identity bind request, the identity's certificate has been stored |
+| ACTIVATED | The identity has been activated (from being in ISSUED or BOUND state) and has a certificate that represents identity |
+| REVOKED | The identity has been revoked |
+
+## ACTIVATED
+AN activated identity will be checked against the incoming certificate of the transaction invoker to determine if the identity is known and what participant that identity is bound to.
+
+### ISSUED
+When an identity is issued, this has registered the user with the fabric ca, but not certificate has been allocated as yet. The identity registry needs the certificate in order to understand who submitted the transaction, but as there isn't one yet, the registry will hold some information about the identity. It holds the name of the identity (ie what would be in the common name field of any cert that would represent that identity) plus the public key of the issuer identity, ie the identity that made the identity issue request. 
+
+The runtime needs to check an identity and it uses the certificate of the transaction invoker to make that check as the issued identity doesn't have a certificate it cannot check against this identity. This is where activation comes in. An identity in issued state must be activated in order to effectively register that identity as usable. Activation happens under the covers, you don't need to do anything explicitly. 
+
+An issued identity is activated only if the identity being activated has the same issuer of that of the identity that invoked the identity issue in the first place. Because of this restriction and potential to perhaps attach a different identity to the participant than the intended one from the fabric ca when enrolling the issued identity, identity issue should be avoided for production environments.
+
+### BOUND
+When an identity is bound, you register the certificate of the identity you want to associate with a participant. At activation time, this is just a case of changing the state from BOUND to ACTIVATED. 
+
+
+### REVOKED
+This marks the identity as revoked, any request using this identity will be rejected. Note that what get's revoked is not the Certificate but the Public Key of the Certificate. This effectively revokes the Private Key of the identity and so you can not generate a new certificate from that private key. The certificate will also be considered revoked.
 
 ### [Next - Connection Profiles](./connectionprofiles.md)

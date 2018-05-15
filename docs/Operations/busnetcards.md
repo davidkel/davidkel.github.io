@@ -4,7 +4,7 @@
 # Business network cards
 TBD:(insert diagram)
 
-TBD
+TBD: More details about what a business network card is
 - Amalgomation of 2 things
   - Connection Profile
   - either
@@ -45,7 +45,7 @@ The recommended practice is
 
 ### Business Network Cards that don't represent a business network and roles
 
-**TBD**
+TBD: Business network cards that don't rep a business network and roles
 
 #### Roles in a business network card
 A Business network card can have roles associated with it, you will see the option in `composer card create` to apply roles to cards. You only need to apply roles to cards if you plan to use the cards in `Composer Playground`. Also you only can add roles to cards that do not define a business network. These are the special cards you would create as described above. 
@@ -60,7 +60,7 @@ The following roles are available
 In both the case of the composer sample fabric server and fabric samples themselves the channel admin's are usually the admins for the peers in the network.
 
 ## Using the Composer CLI to create a business network card
-TBD
+TBD: Using the composer CLI to create a business network card.
 
 
 ### [Next - NetworkAdmin Participant Type](./networkadmin.md)

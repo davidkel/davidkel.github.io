@@ -9,7 +9,7 @@ Deploying a new release of a business network follows a similar pattern to deplo
 - install the new business network onto the peers
 - request upgrade to upgrade the currently running business network to the new version.
 
-TBD: Add information again about business network cards
+You would use the same business network cards discussed in [Deploying Business Networks](./deploy.md) for install and the card you used to start a business network you would use to upgrafe the business network.
 
 Upgrading, similar to start, is something that has to be agreed across all participanting organisations. So each organisation must first install the new version of the business network onto their peers using the `composer network install` command. Once all peers in the network are ready and agreement has been reached then the `composer network upgrade` can be used to upgrade the business network. 
 

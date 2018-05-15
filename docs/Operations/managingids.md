@@ -124,7 +124,7 @@ You specify the participant using it's fully qualified name (-a) and the file co
 This registers the identity in the Composer identity registry and is marked as `BOUND`. It still needs to be activated and that will happen on the first interaction where that identity is used and is done automatically.
 
 ## Composer identity issue
-TBD
+TBD: Information about Composer Identity Issue
 
 ```
 composer identity issue -c admin@digitalproperty-network -u JDaniels -a net.biz.digitalPropertyNetwork.Person#P1
@@ -135,7 +135,14 @@ composer identity issue -c admin@digitalproperty-network -u JDaniels -a net.biz.
 - creates a card with a secret in :-(
 
 ## listing existing identities and participants
-TBD
+There are 2 commands here that provide information here
+- composer identity list
+- composer network list
+
+### composer identity list
+This is an invaluable command for finding out what identities have been registered to the composer runtime, their identifiers, state (ISSUED, BOUND, ACTIVATED, REVOKED) and what participants they are mapped to. see [The Hyperledger Composer Security Model](./idsandparts.md) for more information.
+
+An example of the command is as follows. You must use a card that has the appropriate permissions see [ACLs](./acls.md) for more information.
 
 ```
 composer identity list -c admin@digitalproperty-network
@@ -175,6 +182,15 @@ composer identity list -c admin@digitalproperty-network
 
 Command succeeded
 ```
+In the above we see an activated identity with a name of `admin` and it's associated public certificate in PEM format and it is mapped to the participant `resource:org.hyperledger.composer.system.NetworkAdmin#admin`.
+
+There is also an issued identity called `JDaniels`, and because it is issued, there is no associated certificate as yet. It is mapped to the participant `resource:net.biz.digitalPropertyNetwork.Person#P1`.
+
+
+### composer network list
+You use this command to get a bit more information about participants in the network.
+
+Here is an example of listing the participant registry for `net.biz.digitalPropertyNetwork.Person` to see what participants of this type have been defined. 
 
 ```
 composer network list -c admin@digitalproperty-network -r net.biz.digitalPropertyNetwork.Person
@@ -198,6 +214,8 @@ registries:
 
 Command succeeded
 ```
+This example lists the participant registry for the inbuilt participant type `org.hyperledger.composer.system.NetworkAdmin` to see what participants of this type have been defined. 
+
 
 ```
 composer network list -c admin@digitalproperty-network -r org.hyperledger.composer.system.NetworkAdmin
@@ -220,22 +238,29 @@ registries:
 Command succeeded
 ```
 
-
 ## Revoking identities
-TBD
-- composer identity revoke (needs composer identity list)
-Stops access to the business network, not the fabric.
-- what revoke actually does
-- WARNING: you can revoke yourself.
+To revoke an identity, you need to know it's identifyId (also known as the identifier). Although the command may reference -u or --userId it doesn't use a username. This means you have to use the `composer identity list` command to determine the identifier from the `identityId` property of the identity you wish to revoke. In the previous example for `composer identity list`, `admin` has an identity id of `60f17aae92d098026db2d3a63ebce520bf99195128d128f8ca9a0d051ac3a649`, so if I wanted to revoke that identity I would issue
+
+```
+composer identity revoke -c NewAdmin@digitalproperty-network --identityId 60f17aae92d098026db2d3a63ebce520bf99195128d128f8ca9a0d051ac3a649
+```
+
+As talked about previously, when you revoke an identity, you revoke the public key of that identity. This means you cannot generate new certificates from the private key of that identity and use that. You will have to create a new private/public key for that identity.
+
+An important aspect. When you revoke this identity you revoke their access to the business network **NOT** the fabric network (Fabric will still allow them to perform fabric level activity), or the fabric-ca (for example if they have issuer authority). You would need to look at what is required to revoke them from the fabric network itself as well as the fabric-ca.
+
+Finally, be careful. You can revoke the identity you make the request with. So if you have have only 1 business network administrator and you revoke it you will lock yourself out of performing administrative access on that business network.
+
+It would be possible to recover from this so long as you have access to an identity with a bound participant you could install and upgrade to a new business network with updated ACLs to give that participant appropriate abilities, so long as you have not revoked your only fabric admin identity at the fabric level of course. 
 
 ## updating and removing participants
 you cannot update or remove a participant from the CLI, you will either have to write a client application using the composer-sdk or via the rest server or use the rest server explorer UI (if you haven't disabled it)
 
 ## What to do before an identity expires or if it has expired
-TBD
+TBD: What to do around certificate expiration
 
 ## Common problems
-TBD
+TBD: Common problems
 - authorization failure
 - identity not registered
 
@@ -247,6 +272,7 @@ This is my list of recommendations
  
 
 ## Step by step example of deploying a business network, creating an identity and participant for that business network.
+TBD: Step by step
 1. enroll the issuer (let's say it's admin)
 2. register a bnAdmin identity
 3. enroll that bnAdmin identity
@@ -262,8 +288,9 @@ This is my list of recommendations
 13. ping the card to prove it all works
 
 ### Adding a new network admin participant
-TBD
-repeat steps 7-13 but create a NetworkAdmin participant
+It's possible to add another NetworkAdmin participant if you are using that participant for your business network, refer to [ACLs](./acls.md) for more details about defining permissions for participants.
+
+repeat steps 7-13 but create a NetworkAdmin participant in step 9 as follows
 ```
 composer participant add -c admin@trade-network -d '{"$class":"org.hyperledger.composer.system.NetworkAdmin", "participantId":"restadmin"}'
 ```

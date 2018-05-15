@@ -18,4 +18,5 @@
 - [startBusinessNetwork transaction - TBD](./tbd.md)
 - [using an alternative certificate provider - TBD](./tbd.md)
 - [example of using a local NPM registry - TBD](./tbd.md)
+- [Using the Composer SDK Api to perform operational tasks - TBD](./tbd.md)
 - [Appendix - Stuff that still needs to be included](./appendix.md)
