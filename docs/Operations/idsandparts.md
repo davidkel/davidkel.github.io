@@ -64,6 +64,14 @@ The identity registry maintains a state for that identity. An Identity can be in
 | ACTIVATED | The identity has been activated (from being in ISSUED or BOUND state) and has a certificate that represents identity |
 | REVOKED | The identity has been revoked |
 
+All identities must be activated before they can be used. Composer will request an activation for any identity in ISSUED or BOUND state when a connection is made to the business network so should be completely transparent. This detection of activation results in an error message being logged in the peer
+
+```
+error: transaction returned with failure: Error: The current identity, with the name 'admin' and the identifier 'aa216b3767bf4e9a1e2e29ee43fe36a7fe188c0182ae501ddc8976a06c7765e1', must be activated (ACTIVATION_REQUIRED)
+```
+
+On receiving this the composer libraries will then activate the identity and the request attempted again.
+
 ## ACTIVATED
 AN activated identity will be checked against the incoming certificate of the transaction invoker to determine if the identity is known and what participant that identity is bound to.
 

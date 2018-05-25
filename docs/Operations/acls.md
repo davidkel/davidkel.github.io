@@ -49,12 +49,13 @@ For the most part, it's likely for operational aspects that the resources to be 
 
 ## Rules
 The following sections provide some guidance on the rules, however you should consider that as the number of ACL rules grows, performance will be reduced. So you might want to consider using more generic types rather than specific types. Another approach could be to define `DENY` rules followed by a rule that allows everything in the system namespace. ACL rules are processed top to botton so the deny rules will be actioned first.
+
 ### Rules that everyone should have
 There are going to be some rules that everyone (including participants transacting on the business network) need to be able to do anything on the business network.
 
 | resource | operation | description        |
 | -------- | --------- | ------------       |
-| Network | READ | Everyone must have read access to the business network, there may be exceptions where this is not the case but this is a recommendation |
+| Network | READ | Everyone must have read access to the business network, there are some minor exceptions where this is not the case (eg only using an admin connection) |
 | AssetRegistry#HistorianRecord | READ | Everyone who will manipulate an asset, participant or submit a transaction will need to be able to read the Historian Record structure in order to be able to create one |
 | HistorianRecord | CREATE | Everyone who will manipulate an asset, participant or submit a transaction will need to be able to create a Historian Record |
 

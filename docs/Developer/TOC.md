@@ -1,4 +1,4 @@
-# Hyperledger Composer Operations Guide
+# Hyperledger Composer Operations Guide (TBD - No Content yet)
 - [Introduction](./introduction.md)
 - [Using Online Playground](./onlineplayground.md)
 - [Setting up a Local development environment](./localdev.md)
@@ -25,4 +25,6 @@
 - how to use fabric in developer mode
 - use web browser mode of playground as much as possible
 - use a fabric simulator, which I have developed.
+- CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=tutorial-network_default
+  Here "tutorial-network_default" is the network name. You can find your network name by using "docker network ls" command
 

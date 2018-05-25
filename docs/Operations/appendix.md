@@ -35,7 +35,14 @@
      - client version mismatch with runtime version
      - chaincode image fails to build, takes to long to build
      - chaincode fails to register with peer.
+    - Discuss this message in the peer logs
+
+```
+error: transaction returned with failure: Error: The current identity, with the name 'admin' and the identifier 'aa216b3767bf4e9a1e2e29ee43fe36a7fe188c0182ae501ddc8976a06c7765e1', must be activated (ACTIVATION_REQUIRED)
+```     
+  - fingerprint mismatch deploy/upgrade as well as diagnostics
   - cloud wallets
     - wallet to hold sensitive info such as cards, connector info eg fabric keystore for keys & certs
     - can share a wallet through filesystem sharing, remote server
     - danger with fabric-ca admin if you store card with a secret, if 2 people use it at the same time, 2 enrollments can occur
+

@@ -130,11 +130,18 @@ When you start your business network for the first time, you MUST have at least 
 
 The value for `-A` is used to define `participantId` that the NetworkAdmin participant, and will be stored as the username in the created business network card. 
 
-If you specify `-S` then the secret is stored in the business network card and that card will need to enroll using the username and secret in the card to get it's private key and certificate. Therefore the name you specify on the -A must have been registered with the Fabric CA Server previously. This is the way most of the composer documentation and the single org tutorial demonstrate. The identity is registered in the composer runtime as `ISSUED` as described in [The Hyperledger Composer Security Model](./idsandparts.md) section and will need to be activated. **Remember that cards with just secrets in are single use only, you should only import it into one card store, ping it and delete the original card file.** see [Managing Id's and Participants](./managingids.md) for more information about how to avoid having to use secrets. By the way have I mentioned that you should avoid using secrets ? 
+If you specify `-S` then the secret is stored in the business network card and that card will need to enroll using the username and secret in the card to get it's private key and certificate. Therefore the name you specify on the -A must have been registered with the Fabric CA Server previously. This is the way most of the composer documentation and the single org tutorial demonstrate. The identity is registered in the composer runtime as `ISSUED` as described in [The Hyperledger Composer Security Model](./idsandparts.md) section and will need to be activated. **Remember that cards with just secrets in are single use only, you should only import it into one card store, ping it and delete the original card file.** see [Managing Id's and Participants](./managingids.md) for more information about how to avoid having to use secrets. By the way have I mentioned that you should avoid using secrets ? I don't recommend using this option except in a development environment.
 
 If you specify `-C` then that identity is registered in the composer runtime as `BOUND` as described in [The Hyperledger Composer Security Model](./idsandparts.md) section and will need to be activated. The certificate is stored in the business network card, however unless you are using a HSM to manage your private keys, this means that the created business network card is actually not valid. There is no way to also include the private key, so the best thing to do is delete the card and use `composer card create` to create the card yourself.
 
+A further problem will occur if you try to specify multiple identities on the start command. Apart from the fact that if you use `-C` the card files would not be usable, the card files will all contain the same connection profile that was specified by the card that started the business network which would be for a specific organisation and you may be binding identities from different organisations so again this means that the card files could be wrong. This also applies if you are using the `-S` option. 
+
+The Conclusion is 
+**Always create the card files yourself using composer card create and delete the card files created by the start command.**
+
+
 As mentioned you can perform multiple bindings on a single start request, eg
+
 ```
 composer network start -n my-busnet -V 0.0.1 -c admin@consortium -A admin@org1 -C certorg1.pem -A admin@org2 -C certorg2.pem
 ```

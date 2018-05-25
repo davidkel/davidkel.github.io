@@ -4,7 +4,7 @@
 # Connection Profiles
 Connection profiles are a fundamental part of a business network card (see later). The purpose of a connection profile is to describe the components that make up a Hyperledger Fabric Network. They describe
 
-1. The connectivity information of each node (peer, orderer, fabric-ca)
+1. The connectivity information of each physical node (peer, orderer, fabric-ca)
 2. A channel and the nodes that are participating in that channel
 3. The role of the peer in that channel
 4. The Organisations that own the various nodes (peers and fabric-ca servers, but not orderers)
@@ -22,7 +22,7 @@ What will be covered here are some more important aspects of the operational sid
 It's NOT Hyperledger Composer. In fact it is a specification that has come from Hyperledger Fabric (with input from the Composer team) and the implementation for parsing it is available in the fabric node sdk.
 
 ## Portability of business network cards
-The philisophy behind business network cards is that they can be shared. However unless you get the connection profile right, this will not be possible. For example there is no point giving a business network card which contains a connection profile with URLs that contain things like `localhost`, `127.0.0.1` or docker names that can only be resolved by your local docker fabric setup. In the real world, a Hyperledger Fabric network is not going to be running all the nodes on your local development machine, it is going to be running each node on a different machine (be it a set of VMs, Docker Containers, Physical Machines) in some remote location. So the first thing to do when building your connection profile for a Hyperledger Fabric network is to ensure that you use real ip addresses or real resolvable hostnames. You would only use `localhost` when you are running a development fabric for your own use on your own machine. There are known issues with using `localhost` on remote VMs such as AWS even if you are using it as a single development server.
+The philisophy behind [business network cards](./busnetcards.md), which will be discussed in detail in the next section,  is that they can be shared. However unless you get the connection profile right, this will not be possible. For example there is no point giving a business network card which contains a connection profile with URLs that contain things like `localhost`, `127.0.0.1` or docker names that can only be resolved by your local docker fabric setup. In the real world, a Hyperledger Fabric network is not going to be running all the nodes on your local development machine, it is going to be running each node on a different machine (be it a set of VMs, Docker Containers, Physical Machines) in some remote location. So the first thing to do when building your connection profile for a Hyperledger Fabric network is to ensure that you use real ip addresses or real resolvable hostnames. You would only use `localhost` when you are running a development fabric for your own use on your own machine. There are known issues with using `localhost` on remote VMs such as AWS even if you are using it as a single development server.
 
 Secondly, if you are using TLS to communicate with your fabric nodes, you should use the format
 
