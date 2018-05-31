@@ -149,7 +149,30 @@ composer network start -n my-busnet -V 0.0.1 -c admin@consortium -A admin@org1 -
 I would not recommend the `-S` option when working with production fabric networks. It's a nice convenient option when doing development say on a single org fabric. In the above example for example you want to bind identities from 2 different organisations so the -S option would not work as they are unlikely to be registered to the same fabric ca server, more likely they will have registered to their own fabric ca server or even a 3rd party CA.
 
 ## Using the Peer Commands
-TBD (needs research to see how this would be possible, install should be but start will be a problem due to the need to perform a startBusinessNetwork transaction which get's passed as an argument to the start fabric request)
+TBD (needs research to see how this would be possible, install should be but start will be a problem due to the need to perform a startBusinessNetwork transaction which get's passed as an argument to the start fabric request), but this is the only path where you can have signed chaincode packages with instantiation policy.
+
+```
+{
+    "$class": "org.hyperledger.composer.system.StartBusinessNetwork",
+    "bootstrapTransactions": [
+        {
+            "$class": "org.hyperledger.composer.system.AddParticipant",
+            "resources": [
+                {
+                    "$class": "org.hyperledger.composer.system.NetworkAdmin",
+                    "participantId": "admin" <----
+                }
+            ],
+            "targetRegistry": "resource:org.hyperledger.composer.system.ParticipantRegistry#org.hyperledger.composer.system.NetworkAdmin"
+        },
+        {
+            "$class": "org.hyperledger.composer.system.IssueIdentity",
+            "participant": "resource:org.hyperledger.composer.system.NetworkAdmin#admin",
+            "identityName": "admin"
+        }
+    ]
+}
+```
 
 
 ### [Next - Upgrading Business Networks](./upgrade.md)

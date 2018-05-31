@@ -10,4 +10,7 @@ Playground is not really covered in this book. Currently it isn't a tool that sh
 
 There will be some mention of playground in the context of the docker images provided by Hyperledger Composer however.
 
+## Versioning between client side Composer and runtime Composer
+TBD: Versioning requirements, tricky one to decide where this should go in the book, so I put it here.
+
 ### [Next - The Hyperledger Composer security model](./idsandparts.md)

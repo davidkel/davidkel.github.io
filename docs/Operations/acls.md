@@ -209,4 +209,6 @@ rule NetworkAdminParticipantAccess {
 
 Ideally it would be have been good if IssueIdentity, BindIdentity, RevokeIdentity all inherited from an IdentityTransaction, then we could collapse 3 rules into 1 and also include ActivateCurrentIdentity as well, but unfortunately that isn't how the system model is designed currently.
 
+TBD: Do I want to split ACLs out into (identity management, diagnostic management, resetbusinessnetwork is a bad idea to ever allow)
+
 ### [Next - Cloud Wallets](./cloud-wallets.md)

@@ -130,7 +130,7 @@ TBD: Information about Composer Identity Issue
 composer identity issue -c admin@digitalproperty-network -u JDaniels -a net.biz.digitalPropertyNetwork.Person#P1
 ```
 
-- Identity issue and the 2 priviledges it requires
+- Identity issue and the 2 priviledges it requires, plus must be able to write the card otherwise you end up with a indetermined state.
 - single enrollment only, can never be enrolled again.
 - creates a card with a secret in :-(
 

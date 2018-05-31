@@ -32,7 +32,7 @@ These are covered in detail [here](./connectionprofiles.md) but in summary a con
 ## Credential information stored in a card
 There are 2 types of credential information that a card could hold
 
-- One that has a certificate and optionally a private key (you won't have a private key if your card is able to interact with an HSM. HSMs are covered later in this book)
+- One that has a certificate and optionally a private key (you won't have a private key if your card is able to interact with an HSM. HSMs are covered later in this book) ie an appropriate fabric recognised _identity_ as described in [The Hyperledger Composer Security Model](./idsandparts.md)
 - One that has only a secret stored in the metadata of the card.
 
 But let me make a recommendation now, **Don't use Cards with Secrets for production**. Cards with secrets cause more confusion about how security works than anything else around the Hyperledger Composer security model. Avoiding using secrets may seem impossible, but as you read through this book I hope that the alternatives will become more clear.
@@ -58,10 +58,12 @@ The recommended practice is
 ## Name of the Business Network
 This identifies the specific business network that this card can be used with. This implies that the card's identity is registered to the business network runtime and is bound to a participant.
 
-### Business network cards without a business network defined in them
+### Fabric Network cards. (Business network cards without a business network defined in them) 
 It is possible to have a business network card without a business network defined in it, which kind of makes the name of these cards strange... But you can and what does this card represent ? Composer wanted to use these cards for being able to perform fabric level operations such as installing a business network, starting a business network and upgrade a business network. These actions are not something the business network itself get's involved with directly but are actions upon them controlled by hyperledger fabric itself. For more information about this the [Deploy](./deploy.md) and [Upgrade](./upgrade.md) sections of this book provide more detail.
 
-These `special` cards (which aren't business network cards) must not contain a business network name. If you do then they will not work. If you have followed the tutorials for hyperledger composer you will have encountered these types of cards already.
+These `special` cards, which aren't business network cards, so let's call them `fabric network cards`, must not contain a business network name. If you do then they will not work. If you have followed the tutorials for hyperledger composer you will have encountered these types of cards already.
+
+A good way to test whether you have a business network card or a fabric network card is to try to ping it. If you can ping it, then it is a business network card and should NOT be used for fabric level operations. 
 
 ## Roles in a business network card
 A Business network card can have roles associated with it, you will see the option in `composer card create` to apply roles to cards. You only need to apply roles to cards if you plan to use the cards in `Composer Playground`. Also you only can add roles to cards that do not define a business network. These are the special cards you would create as described above. 
@@ -77,6 +79,7 @@ In both the case of the composer sample fabric server and fabric samples themsel
 
 ## Composer CLI commands for managing business network cards
 The Composer CLI provides card and card file management commands
+
 | Command | Description |
 | ------- | ------------|
 | composer card create | Creates a card file which can be imported into a card store |
@@ -137,5 +140,7 @@ credentials:         Credentials set
 ### Other commands that create business network cards
 There are some other commands that create business network cards, for example `composer network start` and `composer identity issue`. These commands are discussed in more detail in the [Deploy](./deploy.md) and [Managing Id's and Participants](./managingids.md) sections.
 
+
+TBD: composer card list -c <card> to give details about a card, eg whether it has a business network associated with it or not.
 
 ### [Next - NetworkAdmin Participant Type](./networkadmin.md)

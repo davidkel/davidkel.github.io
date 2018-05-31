@@ -80,7 +80,9 @@ When an identity is issued, this has registered the user with the fabric ca, but
 
 The runtime needs to check an identity and it uses the certificate of the transaction invoker to make that check as the issued identity doesn't have a certificate it cannot check against this identity. This is where activation comes in. An identity in issued state must be activated in order to effectively register that identity as usable. Activation happens under the covers, you don't need to do anything explicitly. 
 
-An issued identity is activated only if the identity being activated has the same issuer of that of the identity that invoked the identity issue in the first place. Because of this restriction and potential to perhaps attach a different identity to the participant than the intended one from the fabric ca when enrolling the issued identity, identity issue should be avoided for production environments.
+An issued identity is activated only if the identity being used to activate has the same issuer of that of the identity that invoked the identity issue in the first place, plus it has the same common name as that registered in the identity registry. This means there is a potential (albeit very small) risk that allows for a different identity (but has the same name and the same issuer) but isn't the one registered with the fabric ca server to be activated.
+
+It is also possible to use a card that comes from a different issuer to the identity that would come from the fabric CA, although this would entail a complex identity management setup, but in this case it would mean that you couldn't activate the identity when you enrol it from the fabric ca.
 
 ### BOUND
 When an identity is bound, you register the certificate of the identity you want to associate with a participant. At activation time, this is just a case of changing the state from BOUND to ACTIVATED. 

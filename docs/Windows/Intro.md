@@ -35,7 +35,7 @@ This will install a version of the composer-tools package, `fabric-dev-servers` 
 4. download the [FabricDevServer.zip](https://raw.githubusercontent.com/davidkel/ComposerVagrant/master/FabricDevServer/zipped/FabricDevServer.zip) file
 5. unpack the zip file into your new fabric-network directory
 6. change to that directory in a command prompt window
-7. run the command `vagrant up` in the current directory to bring up the fabric-network for the first time
+7. run the command `vagrant up` in the current directory to bring up the fabric-network for the first time. The fabric network will be the latest available version that has been published.
 8. Note the file `PeerAdmin@fabric-network.card` in your current directory that gets created once the environment has finished starting up the fabric.
 
 ```

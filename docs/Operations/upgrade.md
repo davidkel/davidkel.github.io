@@ -47,4 +47,76 @@ If you allow the runtime to also be upgraded, then there is a check in the to re
 
 You can also use the upgrade process to just upgrade the runtime and not change the business network but you will still have to change the version number of the business network in package.json, install the new business network on all the peers then perform an upgrade.
 
+### Just upgrading the Composer runtime to a new micro version
+As composer has a runtime component that is part of the business network, there may be times when you want to be able to upgrade that component (for example you want to address a bug which has been fixed). Let's describe this by walking through an example
+
+1. First ping using a business network card to determine the current version of the runtime
+
+```
+$ composer network ping -c admin@basic-sample-network
+The connection to the network was successfully tested: basic-sample-network
+	Business network version: 0.1.14
+	Composer runtime version: 0.19.1   <--------
+	participant: org.hyperledger.composer.system.NetworkAdmin#admin
+	identity: org.hyperledger.composer.system.Identity#b4b1df68b1f66a76357b4dd12c2ad1c49770cb4c553d94e36cbc1e08713ac9ef
+```
+
+2. we see this is version 0.19.1 and we want to upgrade to 0.19.6, so go to your business network definition source and edit the package.json. It's likely that there is no reference to the composer runtime dependencies, in which case they need to be added, otherwise you need to change the values. An example package.json might be
+
+```
+{
+  "engines": {
+    "composer": "^0.19.0"
+  },
+  "name": "basic-sample-network",
+  "version": "0.2.4",
+  "description": "The Hello World of Hyperledger Composer samples",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hyperledger/composer-sample-networks.git"
+  },
+  "keywords": [
+    "sample",
+    "composer",
+    "composer-network"
+  ],
+  "author": "Hyperledger Composer",
+  "license": "Apache-2.0"
+}
+```
+add the `dependencies section`, and remember to increase the `version` in this case from 0.2.4 to 0.2.5
+
+```
+{
+  "engines": {
+    "composer": "^0.19.0"
+  },
+  "name": "basic-sample-network",
+  "version": "0.2.5",
+  "description": "The Hello World of Hyperledger Composer samples",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hyperledger/composer-sample-networks.git"
+  },
+  "keywords": [
+    "sample",
+    "composer",
+    "composer-network"
+  ],
+  "author": "Hyperledger Composer",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "composer-common": "0.19.6",
+    "composer-runtime-hlfv1": "0.19.6"
+  }
+}
+```
+
+3. repackage the bna `composer archive create --sourceType dir --sourceName . -a .basic-sample-network-0.2.5.bna"
+
+Now you have a new bna you can use to perform an upgrade with.
+
+**Remember to update your CLI and Client application dependencies of Composer to the same version you upgrade the runtime to or higher. A Client side application, CLI or Rest server must be at least at the same version or higher micro version in order to be able to work with the runtime**
+
+
 ### [Next - Managing identities and participants](./managingids.md)

@@ -27,4 +27,7 @@
 - use a fabric simulator, which I have developed.
 - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=tutorial-network_default
   Here "tutorial-network_default" is the network name. You can find your network name by using "docker network ls" command
+- how to debug ACLs or run a simulation to get results
+- how to debug queries
+- script to package, install, upgrade
 
