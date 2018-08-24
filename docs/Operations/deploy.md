@@ -10,10 +10,15 @@ Starting in 0.19 of Composer, there was a fundamental shift wrt to deploying a b
 3. There would be no way for Composer transaction functions to ever be able to use external 3rd party node.js libraries.
 4. It just didn't make sense, the business network is more than just a set of config files and simple scripts. It defines the whole application, not the runtime.
 
-For this reason in 0.19 and beyond, the stanza is this. **Your business network IS the hyperledger fabric chaincode.** What this this mean ?
+From 0.19 and beyond, your business network can be considered a fabric chaincode artefact and as such in theory could be installed and instantiated as though it were pure chaincode using other fabric capabilities (for example the peer command and node-sdk apis). This isn't the case however. A Business network isn't the complete chaincode, the composer runtime is still the chaincode (as it implements the required chaincode interfaces of init/invoke) and still drives the execution of the logic contained in the business network.
 
-1. The business network is now the first class citizen. It controls all the dependencies
-2. The business network is now deployed in the same way as all other hyperledger fabric chaincode. This means in theory that you don't have to use composer commands to install, start or upgrade a business network. It should be perfectly possible to use the other fabric capabilities such as the SDKs, Peer Commands or other providers facilities to deploy chaincode. In this respect you would not create a business network archive or use a business network archive, but just the indidivual files in a directory similar to a standard node.js package.
+In order for a business network to work as a standard node chaincode package for fabric there are certain pre-requisites that must be in the `package.json` of a bna in order for this to actually work. None of the samples include these pre-reqs, and neither are they put in when you create the archive using the `composer archive create`. They are however injected when you perform a `composer network install` onto a real fabric network. The reason that it is only done there is because a bna could in the future be deployed to a different type of network (ie not fabric) and in that case these changes may not have been appropriate for that target. Only at install time where it is declared through the card that contains the connection profile is it known what the target is and appropriate information can be inserted.
+
+See [Under the covers](./deploy.md#under-the-covers) for more details about what needs to be inserted into a standard package.json for a business network in order to turn it into proper hyperledger fabric node chaincode.
+
+There is a Bug/Feature of composer (most commonly seen when using playground) where if you export a business network that has been deployed to a real fabric  you will get back a bna which will have these
+extra entries already put in.
+
 
 ## Deploying = Install + Start
 deploying business networks requires 2 steps
@@ -91,7 +96,7 @@ In order for a business network to actually work it needs to depend on the follo
 }    
 ```
 
-Then the install process will put this version of the package.json onto the peer for you (assuming composer-cli version 0.19.1)
+Then the install process will put this version of the package.json onto the peer for you (assuming composer-cli version 0.19.14)
 
 ```
 {
@@ -104,8 +109,8 @@ Then the install process will put this version of the package.json onto the peer
      "author": "Hyperledger Composer",
     "license": "Apache-2.0",
     "dependencies": {
-      "composer-common": "0.19.1",
-      "composer-runtime-hlfv1": "0.19.1"
+      "composer-common": "0.19.14",
+      "composer-runtime-hlfv1": "0.19.14"
     }
 }
 ```
