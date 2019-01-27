@@ -57,4 +57,4 @@ At the moment, Composer is not production ready. The main issues being around Ri
 
 
 ## Going forward with new capabilities
-In general, composer should define it's own capabilities and not be driven by new capabilities in fabric. However, fabric operational capabilities such as service discovery make sense to be exposed. 
+In general, composer should define it's own capabilities and not be driven by new capabilities in fabric. However, fabric operational capabilities such as service discovery make sense to be exposed as composer operational capabilities are driven by the capabilities of fabric.
