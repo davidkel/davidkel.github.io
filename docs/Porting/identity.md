@@ -40,7 +40,21 @@ asset Identity identified by identityId {
 On the client side you could get access to this registry by using the `getIdentityRegistry` on a business network connection that then provided a `registry` object to be able to work with the Identity Asset.
 
 In Composer Transaction Processor functions you could use `getCurrentParticipant` to get the current participant executing the transaction. As there is no concept of a participant in chaincode/smart contracts there is no equivalent.
-However you could also use the `getCurrentIdentity` and you would use the `client identity` api to do similar things. 
+You could also use the `getCurrentIdentity` to get the current identity, the `client identity` api will allow you to get the same information.
 
-TODO: reference client identity better.
+If you are using the contract api then the identity api can be obtained from the context
+```
+public async someTransaction(ctx, ...) {
+   // ctx.identity contains the identity apis
+}
+```
+
+If you are using the old fabric-shim api then you would do this to get the identity api
+```
+const ClientIdentity = require('../chaincode').ClientIdentity;
+...
+public async someTransaction(stub, ...) {
+   const identity = new ClientIdentity(stub);
+}
+
 ### [Next - BNA](./packaging.md)
