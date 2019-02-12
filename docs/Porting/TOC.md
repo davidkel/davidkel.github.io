@@ -1,4 +1,4 @@
-# Hyperledger Composer Porting Guide version 0.1.0
+# Hyperledger Composer Porting Guide version 0.1.1
 
 Provides guidance for porting a Composer application to a Hyperledger Fabric 1.4 Application.
 This is a living document so will change over time so worth checking back.

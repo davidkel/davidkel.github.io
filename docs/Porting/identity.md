@@ -14,8 +14,7 @@ There is no equivalent in hyperledger fabric to this concept as it really is par
 The `identity issue` capability also performed some extra steps using the fabric-ca. It would register a user to the fabric-ca-server and collect the secret that is returned.
 Composer would, if only gven a card with a secret, would `enroll` that user automatically. 
 
-You can perform manual `register` and `enrollment` against a fabric-ca-server using the `fabric-ca-client` CLI.
-TODO: Provide a reference to the fabric-ca CLI
+You can perform manual `register` and `enrollment` against a fabric-ca-server using the [fabric-ca-client CLI](https://hyperledger-fabric-ca.readthedocs.io/en/release-1.4/users-guide.html#fabric-ca-client)
 
 Identity records which provide the mapping between identities and participants are stored with a base key of `Asset:org.hyperledger.composer.system.Identity` and the extension key will be the value of the `identityId` field.
 
