@@ -32,11 +32,6 @@ All in all the modeling capabilities in Hyperledger Composer were very comprehen
 
 The new node.js programming models in hyperledger fabric 1.4 do not provide any modeling capabilities, It can provide the ability to validate input values match a particular defined schema (as defined by the contract metadata you provide or via typescript annotations). It is up to the developer to provide whatever data management and validation capabilities are required themselves. 
 
-You may have seen Hyperledger Concerto which takes the Composer modeling capabilities into a standalone component. However you should consider the following if contemplating using this.
-1. It's not got an active community or backed by a company
-2. It may not be fully up to date with bug fixes that have gone into composer since it was split out
-3. One of the concerns reported back to composer was the performance of the modeling runtime managing the data and performing validation which may or not be a concern depending on whether TPS is important to you or not.
-
 It is recommended you look at Typescript as opposed to javascript for developing both your client and chaincode applications. Typescript allows you to model your data and provide compile time validation of your code. If you do also want runtime validation you can look to see if there are any options to provide runtime validation for typescript or you could build your own validation in.
 
 ### [Next - Resource creation and data validation](./datastorage.md)
