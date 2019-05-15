@@ -294,6 +294,3 @@ repeat steps 7-13 but create a NetworkAdmin participant in step 9 as follows
 ```
 composer participant add -c admin@trade-network -d '{"$class":"org.hyperledger.composer.system.NetworkAdmin", "participantId":"restadmin"}'
 ```
-
-
-### [Next - Cloud Wallets](./cloud-wallets.md)

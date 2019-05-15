@@ -34,4 +34,4 @@ The new node.js programming models in hyperledger fabric 1.4 do not provide any 
 
 It is recommended you look at Typescript as opposed to javascript for developing both your client and chaincode applications. Typescript allows you to model your data and provide compile time validation of your code. If you do also want runtime validation you can look to see if there are any options to provide runtime validation for typescript or you could build your own validation in.
 
-### [Next - Resource creation and data validation](./datastorage.md)
+### [Next - Resource creation and data validation](./modelmanagement.md)

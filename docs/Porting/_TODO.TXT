@@ -1,0 +1,5 @@
+1. Info about serialization (modelmanagement.md)
+2. information about query both client side and chaincode side
+3. getNativeAPI and invokeChaincode
+4. fix URL
+5. Fix bnaport to explain more about manual serialization

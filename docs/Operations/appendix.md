@@ -39,6 +39,7 @@
      - chaincode image fails to build, takes to long to build (REQUEST_TIMEOUT)
      - chaincode fails to register with peer.
      - Discuss this message in the peer logs
+     - GRPC trace
 
 ```
 error: transaction returned with failure: Error: The current identity, with the name 'admin' and the identifier 'aa216b3767bf4e9a1e2e29ee43fe36a7fe188c0182ae501ddc8976a06c7765e1', must be activated (ACTIVATION_REQUIRED)
