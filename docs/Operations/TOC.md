@@ -9,7 +9,7 @@
 - [Upgrading business networks](./upgrade.md)
 - [ACLs for operations](./acls.md)
 - [Managing identities and participants](./managingids.md)
-- [Certificate Renewal - TBD](./tbd.md)
+- [Certificate Renewal](./certrenewal.md)
 - [Certificate Revocation - TBD](./tbd.md)
 - [Cloud Wallets - TBD](./tbd.md)
 - [Hyperledger Composer docker images - TBD](./tbd.md)
