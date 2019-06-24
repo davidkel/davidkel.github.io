@@ -1,4 +1,7 @@
-# Hyperledger Composer Porting Guide version 0.1.2
+# Hyperledger Composer Porting Guide version 0.1.3
+
+## Changes
+- fabric-network 1.4.2 now has support for event listening. Updated guide and sample to reflect this.
 
 Provides guidance for porting a Composer application to a Hyperledger Fabric 1.4 Application.
 This is a living document so will change over time so worth checking back.
