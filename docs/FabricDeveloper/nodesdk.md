@@ -1,0 +1,46 @@
+# Node SDK tips
+
+## performing queries
+the low level node sdk provides some access to things like querying by block number or by transaction id. You can still do this using fabric-network by obtaining the underlying `channel object`, but there is another way which utilises the benefit of the more robust query handlers available in fabric-network.
+
+```javascript
+	const BlockDecoder = require('fabric-client/lib/BlockDecoder');
+
+	const ProtoLoader = require('fabric-client/lib/ProtoLoader');
+
+	const queryProtoLoc = require.resolve('fabric-client/lib/protos/peer/query.proto');
+	const queryProto = ProtoLoader.load(queryProtoLoc).protos;
+
+	const ledgerProtoLoc = require.resolve('fabric-client/lib/protos/common/ledger.proto');
+	const ledgerProto = ProtoLoader.load(ledgerProtoLoc).common;
+
+	// assume we have an appropriate gateway with an identity which can perform all the 
+	// queries
+	const channel = 'mychannel';
+	const network = gateway.getNetwork(channel);
+	const qscc = network.getContract('qscc');
+	const lscc = network.getContract('lscc');
+	const cscc = network.getContract('cscc');
+
+    let resources = await this.qscc.evaluateTransaction('GetBlockByNumber', channel, '7');
+    console.log(BlockDecoder.decode(resources).data.data[0].payload);
+
+    resources = await this.qscc.evaluateTransaction('GetTransactionByID', channel, 'a494d037b2930263a533bab78efbe7bb2635fcda9b44ae58e03a275bad6b9331');
+    console.log(BlockDecoder.decodeTransaction(resources));
+
+    resources = await this.qscc.evaluateTransaction('GetChainInfo', 'mychannel');
+    console.log(ledgerProto.BlockchainInfo.decode(resources));
+
+	// requires channel admin authorities
+	let resources = await this.cscc.evaluateTransaction('GetConfigBlock', 'mychannel');
+	console.log(BlockDecoder.decode(resources).data.data[0].payload)
+	
+    resources = await this.lscc.evaluateTransaction('getchaincodes');
+    console.log(queryProto.ChaincodeQueryResponse.decode(resources));
+}
+```
+Using evaluate transaction by default will go to a peer in your organisation and it doesn't matter which peer you go to. For queries that are peer specific (eg getinstalledchaincodes) evaluateTransaction is not a suitable way to invoke. 
+
+Now unfortunately because we are accessing modules and files inside of the node-sdk which aren't published externally in any official capacity then this is not a supported mechanism, but it's unlikely to change in the v1 releases of the node-sdk. However it could change in the v2 node-sdk, but hopefully this might get exposed in a more official manner.
+
+Also it means you have to do all the decoding work that the sdk does as well.

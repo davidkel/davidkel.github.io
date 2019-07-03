@@ -58,8 +58,7 @@ Now we can package our smart contract
 - you will be prompted as to which workspace folder to use, so select your chaincode source folder (in my example it is mycc)
 - Now it should package successfully.
 
-
-**Always look in the Output tab and select the `Blockchain` dropdown menu to see the files that have been packaged into the smart contract.
+**Always look in the Output tab and select the `Blockchain` dropdown menu to see the files that have been packaged into the smart contract.**
 
 you may also want to consider creating a `.vscode` directory in your project folder (in this example `tsproject`) with the file `extensions.json` and contents 
 ```
