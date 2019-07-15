@@ -17,7 +17,7 @@ the low level node sdk provides some access to things like querying by block num
 	// assume we have an appropriate gateway with an identity which can perform all the 
 	// queries
 	const channel = 'mychannel';
-	const network = gateway.getNetwork(channel);
+	const network = await gateway.getNetwork(channel);
 	const qscc = network.getContract('qscc');
 	const lscc = network.getContract('lscc');
 	const cscc = network.getContract('cscc');
