@@ -1,6 +1,24 @@
 # Node SDK tips
+This section provides general information about developing node.js cliernt application. It covers my experience of using `fabric-network`, the so called `low-level` api as well as the `low-level` apis in fabric-client and fabric-ca-client. The fabric-network api provides an easier to use api and solves some of the complexitities of the `low-level` api such as event handling. Event handling is one of the major issues that application developers got wrong when trying to develop node client applications. `fabric-network` unfortunately only provides a subset of capabilities, so you will still find yourself having to work with `fabric-client` and `fabric-ca-client` for your applications. A summary of `fabric-network` capabilities are
+1. Identity Storage Management through Wallets
+2. Submit/Notify (incorporating transaction event handling) with HA Capabilities
+3. Query with HA capabilities
+4. pluggable transaction event strategies
+5. pluggable query handlers
+6. pluggable wallets (maybe, not sure this was published)
+7. pluggable event stuff for other types of events such as chaincode/block (this seems horrible and complex personally)
 
-## performing queries
+
+## HSM Support
+
+
+## pluggable commit handlers
+well hidden feature of fabric-client (also used by fabric-network)
+
+## pluggable endorsement handlers
+well hidden feature of fabric-client (also used by fabric-network)
+
+## performing special queries using `fabric-network`
 the low level node sdk provides some access to things like querying by block number or by transaction id. You can still do this using fabric-network by obtaining the underlying `channel object`, but there is another way which utilises the benefit of the more robust query handlers available in fabric-network.
 
 ```javascript
