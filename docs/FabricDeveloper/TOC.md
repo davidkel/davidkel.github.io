@@ -6,5 +6,5 @@ Hints and tips for the various developer areas
 - [Node Chaincode](./nodechaincode.md)
 - [Node SDK](./nodesdk.md)
 - [Java Chaincode](./javachaincode.md)
-- [Java SDK](./javachaincode.md)
+- [Java SDK](./javasdk.md)
 

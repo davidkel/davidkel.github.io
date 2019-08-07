@@ -8,6 +8,25 @@ This section provides general information about developing node.js cliernt appli
 6. pluggable wallets (maybe, not sure this was published)
 7. pluggable event stuff for other types of events such as chaincode/block (this seems horrible and complex personally)
 
+## How to debug Go GRPC flows
+
+```bash
+export GRPC_TRACE=all
+export GRPC_VERBOSITY=DEBUG
+```
+GRPC_TRACE can accept various components such as `tcp`
+
+## How to turn on SDK debugging
+https://fabric-sdk-node.github.io/release-1.4/tutorial-logging.html
+```
+export HFC_LOGGING='{"debug":"console"}'
+```
+
+and to turn off all logging as the default is to output warnings and errors to the console
+
+```
+export HFC_LOGGING='{"off":"console"}'
+```
 
 ## HSM Support
 

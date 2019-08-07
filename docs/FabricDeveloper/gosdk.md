@@ -314,6 +314,10 @@ GRPC_GO_LOG_VERBOSITY_LEVEL=4
 GRPC_GO_LOG_SEVERITY_LEVEL=INFO (that is the highest)
 ```
 
+## How to turn on GO SDK Logging
+**INVESTIGATE**
+Need to investigate, doesn't look like it is controllable via env vars. May be only able to do it using code.
+
 ## Notes from experiments with master
 ```
 BYFN
