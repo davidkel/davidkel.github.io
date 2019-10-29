@@ -17,6 +17,7 @@ It is recommended that you upgrade hyperledger fabric first before upgrading you
 
 - Ensure your client applications have been shut down prior to performing the upgrade to Composer 0.20.8
 - Download the composer-cli version 0.20.8 (or higher). You should be explicit about the version so that you know exactly which versions you are working with
+
 ```
 npm install composer-cli@0.20.8
 ```
