@@ -1,4 +1,6 @@
 # Migrating from Composer 0.19 to Composer 0.20
+Version: 0.0.1
+
 As described in the release notes, Composer 0.19 is only compatible with Hyperledger Fabric 1.1 and Composer 0.20 is only compatible with Hyperledger fabric 1.2 to 1.4. Hyperledger fabric allows you to upgrade from previous versions starting at 1.1 to Hyperledger fabric 1.4 however in the past you could not upgrade Composer from 0.19 to 0.20. Starting with Composer 0.20.8, that restriction was removed as the composer runtime data structures have not changed between 0.19 and 0.20. This document provides simple guidance for upgrading your version of Composer after you have upgraded to a newer version of Hyperledger fabric.
 
 It is highly recommended that you perform local testing of your applications on Composer 0.20.8 (or higher) first using a local fabric setup.
@@ -21,13 +23,16 @@ It is recommended that you upgrade hyperledger fabric first before upgrading you
 ```
 npm install composer-cli@0.20.8
 ```
+
 - Open the package.json of your business network definition to update the `version` property of your business network to a newer version number and see if any of the following lines are listed in the dependencies, ie any dependency starting with the text `composer-` (the version listed below in the example may differ from yours) and if they do exist then you should delete them and repackage your bna file.
 
  For example if you see lines like
+
 ```
 "composer-common": "0.19.20",
 "composer-runtime-hlfv1": "0.19.20"
 ```
+
 you should delete those lines from your package.json file.
 
 - Perform an upgrade of your business network with your new version of the business network by first installing the new business network then performing an upgrade
