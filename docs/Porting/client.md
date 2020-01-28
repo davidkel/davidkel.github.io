@@ -13,3 +13,4 @@ In Composer you could also optionally declare if the transaction should return m
 ### submitTransaction where transaction is read only
 A feature of Composer was to define a transaction as a read only transaction, ie it should not commit it to the blockchain and optionally it could return a value as well (again using the `@returns()` annotation). In this case you would annotate the transaction with the `@commit(false)`. To do the equivalent using the `fabric-network` api you should call `evaluateTransaction` on the `contract` instance or `evaluate` on a `transaction` instance and the result will be returned.
 
+### [Next - Misc other considerations](./misc.md)
