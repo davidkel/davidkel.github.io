@@ -1,5 +1,5 @@
 # Hyperledger Books/Notes
-- [IBM Blockchain Platform: Using The IBM Blockchain VSCode Extension](./docs/vscode/windows.md)
+- [IBM Blockchain Platform: Using The IBM Blockchain VSCode Extension on Windows with WSL2](./docs/vscode/windows.md)
 - [Hyperledger Composer: Operations Guide](./docs/Operations/TOC.md)
 - [Hyperledger Composer: Developer Guide](./docs/Developer/TOC.md)
 - [Hyperledger Composer: Using Windows for Hyperledger Composer](./docs/Windows/Intro.md)
