@@ -70,23 +70,23 @@ I used to like vagrant (not their config file and it's dependency on having to b
 * Vagrant does work with hyper-v and you can have hyper-v enabled as well as WSL2
 * Multipass is a nice simple tool for creating hyper-v linux VMs quickly
 
-**Resource Usage**
-WSL2 processes make use of resource in a similar manner to windows processes, they have full access to all the CPUs/Memory and no diskspace limitations. They seem to share well with all other windows processes (well, I've not had a problem yet) making them very responsive. You can restrict a WSL2 instance's resources if necessary
+**Resource Usage:**
+ WSL2 processes make use of resource in a similar manner to windows processes, they have full access to all the CPUs/Memory and no diskspace limitations. They seem to share well with all other windows processes (well, I've not had a problem yet) making them very responsive. You can restrict a WSL2 instance's resources if necessary
 
 > TODO: Need to put the info in here
 
-**Speed**
-Open a shell and WSL2 is fully ready for use. It's a lot faster than resuming a VM from suspend or starting from new.
+**Speed:**
+ Open a shell and WSL2 is fully ready for use. It's a lot faster than resuming a VM from suspend or starting from new.
 
-**Snapshoting**
-You can use the WSL CLI to export an instance, which should be equivalent to creating a snapshot of your setup. Not tried it yet but must do it on my current environment.
+**Snapshoting:**
+ You can use the WSL CLI to export an instance, which should be equivalent to creating a snapshot of your setup. Not tried it yet but must do it on my current environment.
 
-**A more Complete environment**
-With WSL2 and Hyper-v enabled. I can run multiple linux VMs and WSL2 instances, I can use docker for windows outside of a linux environment.
+**A more Complete environment:**
+ With WSL2 and Hyper-v enabled. I can run multiple linux VMs and WSL2 instances, I can use docker for windows outside of a linux environment.
 
-**other**
-WSL2 uses a lightweight VM using hyper-v technology. hyper-v technology is a type 1 hypervisor and this would hopefully mean that it should be able to run linux apps at near native speed ie non of the clever trickery employed by type 2 hypervisors such as binary transaction in VMWare. Also hope it means that there isn't a concern about having to add support for newer linux kernels.
+**Other:**
+ WSL2 uses a lightweight VM using hyper-v technology. hyper-v technology is a type 1 hypervisor and this would hopefully mean that it should be able to run linux apps at near native speed ie non of the clever trickery employed by type 2 hypervisors such as binary translation in VMWare. Also hope it means that there isn't a concern about having to add support for newer linux kernels.
 
 ### Disadvantages
 
-There are some disadvantages and these are around running full distros with desktops in hyper-v. Basically it's crap. hyper-v working with canonical have created ubuntu images with pre-configured xrdp, but my experience with xrdp is that although it supports passthrough of audio, the gui is just not as responsive when I've used X2Go or Tiger VNC. Plus if you don't go with the small number of prebuilt options in hyper-v. Trying to get xrdp configured working and stable is not a trivial. Of course VirtualBox and VMWare do this much better apart from the handling of 4k screens and HiDPI screens.
+There are some disadvantages and these are around running full distros with desktops in hyper-v. Basically it's crap. Microsoft, working with Canonical, have created ubuntu images with pre-configured xrdp, but my experience with xrdp is that although it supports passthrough of audio, the gui is just not as responsive compared to X2Go or Tiger VNC. If you don't want to use these images then the only alternative is to set up something yourself which isn't too much of a hassle but rather than having a native display driver environment employed by VirtualBox and VMWare, you are stuck with a remote display technology. These display driver technologies are far more comprehensive such as 3d support etc but when I last tried still weren't great with HiDPI and 4K monitors
