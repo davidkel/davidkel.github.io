@@ -46,3 +46,5 @@ In summary
 
 ### A note about Python
 The windows build tools installs Python 2.7 which is currently still ok for use with node-gyp but may stop working in future.
+
+### WSL2 clock skew causes problems for fabric running in docker for windows

@@ -41,6 +41,15 @@ export DISPLAY=$(awk '/nameserver / {print $2; exit}' /etc/resolv.conf 2>/dev/nu
 export LIBGL_ALWAYS_INDIRECT=1
 ```
 
+or 
+
+```bash
+echo "exporting display"
+winip=$(ip route | grep default | awk '{print $3}')
+export DISPLAY=$winip:5.0
+export LIBGL_ALWAYS_INDIRECT=1
+```
+
 I can even share the clipboard between windows and linux apps (although you need to know the rules of when the clipboard might get overwritten otherwise you might think it wasn't working)
 
 ### Docker
@@ -54,8 +63,25 @@ if [ -z "$RUNNING" ]; then
 fi
 ```
 
+### Clock Skew
+There is a known issue with WSL2 in the fact that it suffers from clock skew. This is where the clock inside WSL2 doesn't match the clock on your host windows machine. I've also seen this problem with VirtualBox VMs as well. This becomes a real problem if you are running fabric inside a WSL2 instance but trying to communicate with it from the host machine as fabric, for security reasons, needs to be within a threshold of time difference in order to allow the external client to interact.
+
+I'm not sure how a clock skew occurs as I can't recreate it, but I have 
+
+There are many ways to fix the clock skew which can be found on google, the basic premise is that you tell your wsl instance to synchronise. What I don't know is whether you need to do it for all WSL2 instance or just one of your instances as each instance my share the underlying WSL2 lightweight VM and kernel. There are multiple options to sync the clock
+
+* inside of a WSL2 instance (and using a ubuntu instance)
+  * sudo ntpdate ntp.ubuntu.com &>/dev/null &
+  * sudo hwclock -s
+* outside of a wsl2 instance (ie in a windows CMD prompt or Powershell prompt)
+  * wsl -u root sh -C "hwclock -S" (this would use the default instance which may not be what you want)
+  * wsl -d docker-desktop -u root sh -C "hwclock -S" (to do it specifically for the docker desktop)
+
+One idea I really liked was to have an automated task that ran to fix the clock skew on resume of your laptop. Details can be found at [here](https://stuartleeks.com/posts/fixing-clock-skew-with-wsl-2/)
+
+
 ### AppImages (not specific to WSL2 but wanted to mention them)
-I love these, just download and run. Shame VSCodium stopped producing them and VSCode have refused to create them :-(
+I love these, just download and run. Shame VSCode have refused to create them :-( VSCodium however is creating them
 
 ```bash
 ~$ ./VSCodium-1.49.3-1601685407.glibc2.16-x86_64.AppImage &
@@ -83,6 +109,7 @@ I used to like vagrant (not their config file and it's dependency on having to b
 
 **A more Complete environment:**
  With WSL2 and Hyper-v enabled. I can run multiple linux VMs and WSL2 instances, I can use docker for windows outside of a linux environment.
+ There is a `But`. Hyper-v is still rubbish at Linux VM Guis (not tried windows guis)
 
 **Other:**
  WSL2 uses a lightweight VM using hyper-v technology. hyper-v technology is a type 1 hypervisor and this would hopefully mean that it should be able to run linux apps at near native speed ie non of the clever trickery employed by type 2 hypervisors such as binary translation in VMWare. Also hope it means that there isn't a concern about having to add support for newer linux kernels.
@@ -90,3 +117,13 @@ I used to like vagrant (not their config file and it's dependency on having to b
 ### Disadvantages
 
 There are some disadvantages and these are around running full distros with desktops in hyper-v. Basically it's crap. Microsoft, working with Canonical, have created ubuntu images with pre-configured xrdp, but my experience with xrdp is that although it supports passthrough of audio, the gui is just not as responsive compared to X2Go or Tiger VNC. If you don't want to use these images then the only alternative is to set up something yourself which isn't too much of a hassle but rather than having a native display driver environment employed by VirtualBox and VMWare, you are stuck with a remote display technology. These display driver technologies are far more comprehensive such as 3d support etc but when I last tried still weren't great with HiDPI and 4K monitors
+
+
+## Hints and Tips
+
+### Nested Virtualisation
+Here is a useful tip for hyper-v virtual machines (not for WSL2 machines), if you want to have nested virtualisation you need to enable it specifically while the VM is stopped of course.
+
+```
+(Admin Powershell) Set-VMProcessor -VMName <VM Name> -ExposeVirtualizationExtensions $true
+```
