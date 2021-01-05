@@ -6,6 +6,7 @@ My current recommendation is to avoid java chaincode, it's the least performant 
 
 - [Guidelines for writing node chaincode](./writing-node-chaincode.md)
 - [Guidelines for writing node clients](./writing-node-clients.md)
+- [Guidelines for writing Highly Available node clients](./writing-HA-node-clients.md)
 - [Go Chaincode](./gochaincode.md)
 - [Go SDK](./gosdk.md)
 - [Node Chaincode](./nodechaincode.md)
