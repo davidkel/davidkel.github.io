@@ -14,5 +14,3 @@ Each area requires consideration on how to handle
 - One or more orderers are down
 - Handling MVCC Read conflicts
 - Handling other types of error
-
-

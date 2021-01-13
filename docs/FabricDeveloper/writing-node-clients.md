@@ -3,6 +3,7 @@
 There are currently 2 versions of Fabric Node SDKs, 1.4 and 2.2. The 1.4 library can still be used with Fabric 2.2 (And support is claimed but unsure about using it for future 2.x releases). The 1.4 SDK won't support new features in fabric 2.2 such as receiving blocks containing private data.
 
 ## Deciding between 1.4 SDK and 2.2 SDK
+
 If you are starting out and planning to use the 1.4 SDK then you need to be aware of migration concerns if you then are going to move to using the 2.2 SDK. However there are advantages to using the 1.4 SDK over the 2.2.
 
 * Supports and documents a more comprehensive API (known as the low level api) which allows you to develop applications which may not be possible using the fabric-network Gateway api
@@ -203,3 +204,8 @@ Both 1.4 and 2.2 provide the ability to develop your own strategy plugins, howev
 ## Other
 
 ensure localhost is set explicitly in the discovery options and ensure that the default in your application is `false` (as it's set to true by default which I consider a crazy default). Developers and their development environments set say an environment variable to change the default value to true themselves and will give them a better understanding of what is going on. It also means you don't inadvertently deploy to a real environment such as production with a flag that isn't going to work. The ideal situation is you set up a development environment that is more like the real world, ie use real name resolution rather than using localhost and this value will always be false for these environments.
+
+## servicability
+
+- always have log points
+- have the ability to turn on node sdk logging
