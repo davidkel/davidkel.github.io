@@ -30,8 +30,6 @@ The contract API provides the following capabilities
   - context contains a usable client identity class to determine for information about the invoker
   - you can extend this context for your own needs.
   - invokes unknownTransaction method if can't dipatch the request
-- argument/return value validator (typescript annotations only)
-  - annotations poorly documented
 - serializer (can it handle complex types in typescript annotations ?)
   - inbuilt JSON serializer/deserializer but opaque as to it's workings (no equivalent client side)
   - can be replaced with own
@@ -39,24 +37,30 @@ The contract API provides the following capabilities
     - completely undocumented
   - Is annotation aware for typescript annotations
   - Means you don't have to mess with Buffer objects for return values
-- introspection support
-  - explicit metadata
-  - actually has a cli to help in the generation of explicit metadata
-    - undocumented
-  - derived metadata for javascript/typescript (no annotations)
-  - derived complete metadata for annotated typescript
-  - Can query this client side
+- introspection and data validation support
+  - can provide explicit metadata file to describe the contract conforming to JSON Schema
+    - actually has a cli to help in the generation of explicit metadata
+      - undocumented
+  - can be retrieved by a client using the system contract method getMetadata
+  - will be used to validate input parameters and return values if enough detail provided
+  - also defines the actual exposed transactions for the dispatcher
+  - metadata can be derived for javascript/typescript (no annotations) if no explicit metadata provided
+    - can't perform data validation
+    - includes all methods in a contract (can be controlled but isn't documented. HINT: It's the use of `_` in a method name)
+    - typescript annotations can be used to provide more information
+      - This is poorly documented
 - introduced the ability to plug in different types of api to provide alternatives to the contract api
   - shim has a service provider interface
   - completely undocumented
 - Can support multiple "contracts" in a single chaincode
   - used to allow getting metadata for a contract by defining an included system contract which get's automatically included in your chaincode
-  - Still wondering what the value of this is, I've seen no good use case for this capability from an chaincode creator point of view
+  - Still wondering what the value of this is, I've seen no good use case for this capability from a chaincode creator point of view
   - people incorrectly think this is a way to split a chaincode implementation into multiple files. You can do that already
     - people then can't work out how to call their 2nd contract code from the 1st contract code as the contracts don't have references to each other
-  - aspect like concepts for transactions
-    - before/after transaction method can be implemented
-    - helps remove a little more boiler plate code
+- aspect like concepts for transactions
+  - before/after transaction method can be implemented
+  - helps remove a little more boiler plate code
+  - also includes unknownTransaction (see dispatcher)
 
 For validation the only real documentation that defines for format of the explicit metadata file is
 [here](https://hyperledger.github.io/fabric-chaincode-node/release-2.2/api/contract-schema.json)
@@ -102,6 +106,7 @@ One final point, in chaincode you are able to distinguish between a transaction 
 
 - SetEvent can only store 1 piece of data. Multiple calls will overwrite the previous call
 - Chaincode events are just a block of data. So long as the client understands the format of the data, it's easily possible to store multiple events
+- Chaincode events are just a section in a transaction and a transaction is included in the block. It's the SDKs that receive the committed block and extact that section and emit them in whatever manner they deem appropriate for their language. The main point is that events can only be received once a block has been committed. The SDK may or may not check that the transaction in the block is valid or not. You should check your SDK documentation to confirm.
 
 ```javascript
 const events = [];

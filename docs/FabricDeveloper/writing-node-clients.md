@@ -52,7 +52,7 @@ Other things the application needs to consider are
 (NEEDS WORK)
 
 * reuse
-  * bound to a single identity
+  * bound to a single identity (only loaded once from the wallet)
   * can't change that identity
   * do not constantly connect/disconnect it (especially across async/threads that's really bad)
   * supports concurrent requests through the same gateway instance
@@ -88,6 +88,9 @@ You might for example consider creating a package (zip file) that contains this 
 * have a certificate management policy to handle (your provider may handle the peers, orderers and tls certificate automatically for you)
   * certificate expiration
   * certificate revocation
+
+## Wallets
+
 
 ## Security
 
@@ -142,7 +145,24 @@ One thing to remember is that if you plan to listen for chaincode events you mus
 * Chaincode Events
 * Block Events (useful for off-chain storage for querying)
 
+- events are only emitted to listeners (both gateway and client apis) when a peer you are listening on commits the block.
+
 (WORK NEEDED)
+
+### Listening for events
+
+- check the status, you will get events from transactions that are marked as invalid as well as valid ones
+
+### Chaincode Events
+
+### Block Events
+
+### Transaction Committed Events
+
+### Other suggestions
+
+If you plan to query some data as the result of an event, you must query the peer you received the block from that triggered that event, that's because you can only guarantee that that peer has the information. If you query a peer that hasn't processed that block yet then you may get old or missing data as a result.
+
 
 ### Checkpointing
 
@@ -150,7 +170,7 @@ In order to ensure you don't miss events you need to implement a checkpointing m
 
 This is a large topic so won't be covered outside of what fabric-network provides
 
-### Event Handling Strategies in fabric-network
+### Transaction Commited Event Strategies in fabric-network
 
 There are a set of built in event handling strategies you can choose from, so try to choose one that best suites your needs. The Event Handling Strategy refers to how many transaction committed events and from where those events come from should be received before the submit call unblocks.
 
