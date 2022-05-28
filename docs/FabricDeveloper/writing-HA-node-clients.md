@@ -14,8 +14,29 @@ Each area requires consideration on how to handle
 - One or more orderers are down
 - Client side transaction retry
   - Handling MVCC Read conflicts
-  - Handling other types of error (eg chaincode dying will create a chaincode stream terminated type error)
+
+
+      
+
 ```
+
+```
+## Client error handling and retying transactions
+- MVCC_READ_CONFLICT
+- Phantom reads
+- Timeout waiting for commit events
+- successful submission to orderer is no guarantee that it will be included in a block (see timeout).  Successful delivery to orderer does not guarantee it being included in a block and being delivered (successful delivery to orderer does not guarantee tx gets ordererd, and successful ordering does not guarantee tx gets validated by peers)
+```
+			Event strategy not satisfied within the timeout period. No response received from peers:
+      Event strategy not satisfied within the timeout period. No response received from event hubs:       
+```
+
+- endorsement policy failure
+  - occurs if you don't get enough signatures
+  - also occurs if you do get enough signatures but the proposals don't match (ie 1 or more of the signatures sent weren't over the proposal response that was sent (sdk decides which proposal response out of all received is sent)) see https://stackoverflow.com/questions/66237592/endorsement-policy-failure-while-invoking-chain-code-using-even-if-the-transacti
+ 
+
+```javascript
   public static readonly errorMessagesToRetry: string[] = [
     'MVCC_READ_CONFLICT',
     'ENDORSEMENT_POLICY_FAILURE',
@@ -34,6 +55,15 @@ Each area requires consideration on how to handle
   ];
 ```
 
+Under some circumstances a retry of the transaction is the right thing to do, but there needs to be control so that you don't end up in a permanent loop trying to perform a transaction that will always fail.
+
+The other thing is to avoid is getting into a snowball effect of retries. If you overload a peer with constant proposals then this stops the peer performing validation of existing blocks which could cause the network to stop.
+
+Danger that retrying will just keep the same error (improved now node sdk randomly selects orderers if the orderer was down)
+
+The gateway apis don't allow you to send the same proposal responses (thus keeping the same tx id) which could be used for a timeout situation. If it fails with a transaction id already exists then you know it was committed.
+
+Handling chaincode termination might also be useful. Chaincode dying will create a chaincode stream terminated type error
 
 ## block height, eventual consistency and peer catch up
 (NEED INFO about submission and query etc)

@@ -20,16 +20,22 @@ What it doesn't do is provide any layer between the transaction working with pri
 
 The contract API provides the following capabilities
 
-- dispatcher
+- dispatcher, ie calling the function that handles the function name passed
   - removes the need for boiler plate code if coding to the shim
   - Reality is that's not a lot of code though, but does present a more object orientated way to create your chaincode
+  - (See aspect capabilities)
+- Return values
+  - removes the need to call shim.success and shim.error. Just return the value you want to be serialized back or throw an error making it more appropriate to javascript/typescript
+- aspect like concepts for transactions
+  - before/after transaction method can be implemented
+  - helps remove a little more boiler plate code
+  - also includes unknownTransaction (see dispatcher)
 - context
-  - all contract transaction methods get the same context
+  - all contract transaction methods get the same context object passed as the first parameter (dispatcher does this)
     - this is synonimous to a shim implmentation passing the stub to all chaincode transactions
   - context contains the shim stub for interacting with the states (private/world)
-  - context contains a usable client identity class to determine for information about the invoker
+  - context contains a usable client identity instance to determine information about the invoker
   - you can extend this context for your own needs.
-  - invokes unknownTransaction method if can't dipatch the request
 - serializer (can it handle complex types in typescript annotations ?)
   - inbuilt JSON serializer/deserializer but opaque as to it's workings (no equivalent client side)
   - can be replaced with own
@@ -49,23 +55,19 @@ The contract API provides the following capabilities
     - includes all methods in a contract (can be controlled but isn't documented. HINT: It's the use of `_` in a method name)
     - typescript annotations can be used to provide more information
       - This is poorly documented
-- introduced the ability to plug in different types of api to provide alternatives to the contract api
-  - shim has a service provider interface
-  - completely undocumented
+For validation the only real documentation that defines for format of the explicit metadata file is
+[here](https://hyperledger.github.io/fabric-chaincode-node/release-2.2/api/contract-schema.json)
+
+But this doesn't explain how these capabilities are defined using typescript annotations
+
 - Can support multiple "contracts" in a single chaincode
   - used to allow getting metadata for a contract by defining an included system contract which get's automatically included in your chaincode
   - Still wondering what the value of this is, I've seen no good use case for this capability from a chaincode creator point of view
   - people incorrectly think this is a way to split a chaincode implementation into multiple files. You can do that already
     - people then can't work out how to call their 2nd contract code from the 1st contract code as the contracts don't have references to each other
-- aspect like concepts for transactions
-  - before/after transaction method can be implemented
-  - helps remove a little more boiler plate code
-  - also includes unknownTransaction (see dispatcher)
-
-For validation the only real documentation that defines for format of the explicit metadata file is
-[here](https://hyperledger.github.io/fabric-chaincode-node/release-2.2/api/contract-schema.json)
-
-But this doesn't explain how these capabilities are defined using typescript annotations
+- introduced the ability to plug in different types of api to provide alternatives to the contract api
+  - shim has a service provider interface
+  - completely undocumented and unproven from an external usage perspective
 
 ### Summary
 

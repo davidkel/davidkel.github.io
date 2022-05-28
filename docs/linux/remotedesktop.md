@@ -1,5 +1,6 @@
 # Summary of remote desktop environments
 
+* Multipass
 * VNC
 * X2Go
 * X Servers
@@ -7,6 +8,19 @@
   * Cygwin X
   * XMing
 * xRdp
+
+## Multipass
+
+```bash
+echo "exporting display"
+winip=$(ip route | grep default | awk '{print $3}')
+export DISPLAY=$winip:5.0
+export LIBGL_ALWAYS_INDIRECT=1
+
+
+
+sudo apt install gedit
+```
 
 ## VNC
 Use Tiger VNC
