@@ -209,6 +209,14 @@ Suffice to say large payload sizes are an anti-pattern in any blockchain solutio
 
 Go chaincode performs best, followed by Node chaincode.  Java chaincode performance is the least performant and would not be recommended for high throughput applications.
 
+### Node chaincode
+
+Node is an asynchronous runtime implementation that utilises only a single thread to execute code. It does however run background threads for activities such as garbage collection, however when allocating resources to a node chaincode, for example in Kubernetes where you are limited to available resources, it doesn't make sense to allocate multiple vCPUS for node chaincode. The number of vCPUs in a system usually refers to the number of concurrent threads that can be executed so it's worth monitoring performance of node chaincode to see how much vCPU it uses but it probably doesn't make sense to allocate anything more than a max of 2 vCPUs for node chaincode. In fact you could not assign any resource restrictions to node chaincode as it is self limiting.
+
+### Chaincode processes and channels
+
+Hyperledger Fabric will reuse chaincode processes across channels if the chaincode id and versions match. For example if you have a peer joined to 2 channels (channel_a and channel_b) and you have deployed one chaincode to each channel with the same id and version number, then the peer will only interact with 1 chaincode process for both those channels. It will not try to work with a separate chaincode process for each channel. This means that you may be putting more load on that chaincode process than expected especially if it's node chaincode that is self limiting. If this is a problem you should consider using Go for your chaincode language or you could deploy the same chaincode with a different id or version to the other channel and that will ensure there is a chaincode process per channel.
+
 ### Endorsement policies
 
 For a transaction to be committed as valid, one of the things it must contain is enough signatures to satisfy the chaincode endorsement policy and any state-based endorsement policies. The Peer Gateway service will only send requests to enough peers to satisfy this collection of policies (and will also try other peers if the preferred ones are not available). Thus we can see that endorsement policies will affect performance as it dictates how many peers and thus how many signatures are required to ensure this transaction could be committed.
@@ -263,7 +271,7 @@ The following describes some initial performance runs on Hyperledger Fabric 2.5
 
 ### Hardware and Topology
 
-The Fabric topology used was 2 peer Organisations (PeerOrg0, PeerOrg1) with a single peer node in each and 1 Ordering Service Organisation (OrdererOrg0) with a single orderer service node configured for Raft.
+The Fabric topology used was 2 peer Organisations (PeerOrg0, PeerOrg1) with a single peer node in each and 1 Ordering Service Organisation (OrdererOrg0) with a single orderer service node configured for Raft. TLS was enabled for each node.
 
 Each node had the same identical hardware
 
@@ -283,7 +291,8 @@ Hyperledger Fabric was deployed natively to 3 physical machines (ie the native b
 
 - LevelDB was used for the state database
 - Gateway Service Concurrency limit was set to 20,000
-- A Single Channel was created
+- A single application channel was created and the 2 peers and orderer were joined to this channel
+- No system channel exists only the application channel
 - Go chaincode without the Contract API was deployed (fixed-asset-base from hyperledger Caliper-Benchmarks)
 - Endorsement policy 1 Of Any was specified for the chaincode
 - No private data was used
@@ -297,6 +306,10 @@ Hyperledger Caliper 0.5.0 was used as the load generator and for the report outp
 The load itself was defined from fixed-asset in Hyperledger Caliper-Benchmarks
 
 Caliper used between 3 and 4 bare metal machines to host remote caliper workers to generate the load on the Hyperledger Fabric Network.
+
+### Diagram of overall Topology
+
+![Fabric Performance Run Topology](FabricPerformanceTopology.jpg)
 
 ### Results
 
