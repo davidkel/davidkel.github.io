@@ -211,7 +211,13 @@ Go chaincode performs best, followed by Node chaincode.  Java chaincode performa
 
 ### Node chaincode
 
-Node is an asynchronous runtime implementation that utilises only a single thread to execute code. It does however run background threads for activities such as garbage collection, however when allocating resources to a node chaincode, for example in Kubernetes where you are limited to available resources, it doesn't make sense to allocate multiple vCPUS for node chaincode. The number of vCPUs in a system usually refers to the number of concurrent threads that can be executed so it's worth monitoring performance of node chaincode to see how much vCPU it uses but it probably doesn't make sense to allocate anything more than a max of 2 vCPUs for node chaincode. In fact you could not assign any resource restrictions to node chaincode as it is self limiting.
+Node is an asynchronous runtime implementation that utilises only a single thread to execute code. It does however run background threads for activities such as garbage collection, however when allocating resources to a Node chaincode, for example in Kubernetes where you are limited to available resources, it doesn't make sense to allocate multiple vCPUS for Node chaincode. The number of vCPUs in a system usually refers to the number of concurrent threads that can be executed so it's worth monitoring performance of Node chaincode to see how much vCPU it uses but it probably doesn't make sense to allocate anything more than a max of 2 vCPUs for Node chaincode. In fact you could not assign any resource restrictions to Node chaincode as it is self limiting.
+
+Prior to Node 12, a Node process was limited to 1.5Gb Memory by default and would require you to pass a parameter to the Node executable in order to increase this when running a node chaincode process. You should not be running Node chaincode processes on anything less than Node 12 now and Hyperledger Fabric 2.5 mandates that Node 16 or later should be used. There are various parameters that can be provided to the Node process when you launch your Node chaincode, however it's unlikely you would ever need to override the defaults of Node so no tuning would be required.
+
+### Go chaincode
+
+The Golang runtime provides an excellent implementation for concurrency. It is capable of using all CPUs available to it and thus is only limited by the resources allocated to the chaincode process to use. No tuning is required.
 
 ### Chaincode processes and channels
 
@@ -267,7 +273,7 @@ Sending single transactions periodically will have a latency correlating to the 
 
 ## Performance runs
 
-The following describes some initial performance runs on Hyperledger Fabric 2.5
+The following describes some initial performance runs on Hyperledger Fabric 2.5 builds
 
 ### Hardware and Topology
 
@@ -292,6 +298,7 @@ Hyperledger Fabric was deployed natively to 3 physical machines (ie the native b
 - LevelDB was used for the state database
 - Gateway Service Concurrency limit was set to 20,000
 - A single application channel was created and the 2 peers and orderer were joined to this channel
+  - The application capabilities were set to V1_4 so as to use the old lifecycle deployment. all other capabilities were set to V2_0
 - No system channel exists only the application channel
 - Go chaincode without the Contract API was deployed (fixed-asset-base from hyperledger Caliper-Benchmarks)
 - Endorsement policy 1 Of Any was specified for the chaincode
@@ -305,7 +312,7 @@ Hyperledger Caliper 0.5.0 was used as the load generator and for the report outp
 
 The load itself was defined from fixed-asset in Hyperledger Caliper-Benchmarks
 
-Caliper used between 3 and 4 bare metal machines to host remote caliper workers to generate the load on the Hyperledger Fabric Network.
+Caliper used 4 bare metal machines to host remote caliper workers and also to host a single caliper manager to generate the load on the Hyperledger Fabric Network.
 
 ### Diagram of overall Topology
 
@@ -313,65 +320,112 @@ Caliper used between 3 and 4 bare metal machines to host remote caliper workers 
 
 ### Results
 
-These results were examples of quick runs I made using Fabric 2.4 and block cutting values of
+These results were generated against the latest builds of Hyperledger Fabric 2.5 and the utilised the default values of fabric that exist within the sampleconfig directory of the fabric source code. Specifically the following block cutting parameters were used.
 
-- block_cut_time: 1s
-- block_size: 50
-- preferred_max_bytes: 512 KB
+- block_cut_time: 2s
+- block_size: 500
+- preferred_max_bytes: 2Mb
 
-they will be updated when the 2.5 results are done which will use OOTB block cutting parameters and will also include 1000 byte asset size.
+In order to be able to push enough workload through without hitting concurrency limits, the gateway concurrency limit was set to 20,000.
 
-#### No-op evaluate benchmark
+In summary the following benchmarks are presented here
 
-- workers: (Not captured)
-- fixed-tps, tps: (Not captured)
+- Blind write of a single key with 100 Byte Asset Size (a create asset benchmark)
+- Blind write of a single key with 1000 Byte Asset Size (a create asset benchmark)
+- Read/Write of a single key with 100 Byte Asset Size (an update asset benchmark)
 
-This benchmark determines the theoretical maximum a network. The chaincode transaction is a no-op and does nothing except return. The Evaluate means that the send to orderer, block cutting, validate and commit processing never engages. This type of benchmark is useful for determining things like network and some hardware bottlenecks
-
-```bash
-+----------------+---------+------+-----------------+-----------------+-----------------+-----------------+------------------+
-| Name           | Succ    | Fail | Send Rate (TPS) | Max Latency (s) | Min Latency (s) | Avg Latency (s) | Throughput (TPS) |
-|----------------|---------|------|-----------------|-----------------|-----------------|-----------------|------------------|
-| no-op-evaluate | 2160240 | 0    | 17917.3         | 0.34            | 0.00            | 0.05            | 17916.0          |
-+----------------+---------+------+-----------------+-----------------+-----------------+-----------------+------------------+
-```
-
-#### Blind Write of a single key ~100 Byte Asset Size
+#### Blind Write of a single key 100 Byte Asset Size
 
 A Blind write is a transaction that performs a single write to a key regardless of whether that key exists and contains data. This is a `Create Asset` type of scenario
 
-- workers: (Not captured)
-- fixed-tps, tps: (Not captured)
+- workers: 200
+- fixed-tps, tps: 3000
 
 ```bash
 +------------------+--------+------+-----------------+-----------------+-----------------+-----------------+------------------+
 | Name             | Succ   | Fail | Send Rate (TPS) | Max Latency (s) | Min Latency (s) | Avg Latency (s) | Throughput (TPS) |
 |------------------|--------|------|-----------------|-----------------|-----------------|-----------------|------------------|
-| create-asset-100 | 360150 | 0    | 2996.2          | 2.04            | 0.28            | 0.73            | 2983.6           |
+| create-asset-100 | 360200 | 0    | 2995.0          | 2.13            | 0.18            | 0.33            | 2946.7           |
 +------------------+--------+------+-----------------+-----------------+-----------------+-----------------+------------------+
 ```
 
-#### Read Write of a single key ~100 Byte Asset Size
+#### Blind Write of a single key 1000 Byte Asset Size
 
-This is a test where the transaction will randomly pick an already existing key with data, read it, then modify that key. In the results here you will see some failures.
+- workers: 200
+- fixed-tps, tps: 3000
 
-The world state was loaded with 1 million assets for this test. The results will show some failures however these are MVCC_READ_CONFLICTS and this is to be expected even with a large number of assets preloaded.
+```bash
++------------------+--------+------+-----------------+-----------------+-----------------+-----------------+------------------+
+| Name             | Succ   | Fail | Send Rate (TPS) | Max Latency (s) | Min Latency (s) | Avg Latency (s) | Throughput (TPS) |
+|------------------|--------|------|-----------------|-----------------|-----------------|-----------------|------------------|
+| create-asset-100 | 360200 | 0    | 2993.9          | 3.21            | 0.28            | 1.52            | 2938.9           |
++------------------+--------+------+-----------------+-----------------+-----------------+-----------------+------------------+
+```
 
-- workers: (Not captured)
+Here we see that we can achieve roughly the same throughput but latency increases.
+
+#### Read Write of a single key 100 Byte Asset Size
+
+This is a test where the transaction will randomly pick an already existing key with data, read it, then modify that key. The world state was loaded with 1 million assets for this test to reduce the chance of getting MVCC_READ_CONFLICT validation errors. In this example the TPS rate was low enough and fortunate that no MVCC_READ_CONFLICT validation errors were received.
+
+- workers: 200
+- fixed-tps, tps: 2550
+
+```bash
++---------------------------------------+--------+------+-----------------+-----------------+-----------------+-----------------+------------------+
+| Name                                  | Succ   | Fail | Send Rate (TPS) | Max Latency (s) | Min Latency (s) | Avg Latency (s) | Throughput (TPS) |
+|---------------------------------------|--------|------|-----------------|-----------------|-----------------|-----------------|------------------|
+| read-write-assets-previously-read-100 | 306200 | 0    | 2545.2          | 0.21            | 0.03            | 0.06            | 2544.3           |
++---------------------------------------+--------+------+-----------------+-----------------+-----------------+-----------------+------------------+
+```
+
+MVCC_READ_CONFLICT validation errors are an acceptable error for this test due to the randomness of selecting an asset there is always a chance that it can occur. An MVCC_READ_CONFLICT is generated at block validation time in the peer, but the block is still committed to the blockchain the only difference is the transaction is marked as invalid and no world state update takes place for that transaction. It would be reasonable for a client application to perhaps resubmit that transaction using some policy (however this isn't what the workloads for caliper do). As these errors are acceptable we can look at the maximum TPS where these errors occur.
+
+- workers: 200
 - fixed-tps, tps: 2750
 
 ```bash
 +---------------------------------------+--------+------+-----------------+-----------------+-----------------+-----------------+------------------+
 | Name                                  | Succ   | Fail | Send Rate (TPS) | Max Latency (s) | Min Latency (s) | Avg Latency (s) | Throughput (TPS) |
 |---------------------------------------|--------|------|-----------------|-----------------|-----------------|-----------------|------------------|
-| read-write-assets-previously-read-100 | 324105 | 45   | 2696.4          | 0.51            | 0.03            | 0.09            | 2694.5           |
+| read-write-assets-previously-read-100 | 328815 | 1385 | 2744.8          | 3.80            | 0.05            | 1.59            | 2664.0           |
 +---------------------------------------+--------+------+-----------------+-----------------+-----------------+-----------------+------------------+
 ```
 
-### Future considerations
+#### Read Write of a single key 1000 Byte Asset Size
 
-- maybe experiment with reducing logging (removes response comparison as well but would need an appropriate endorsement policy)
-- maybe experiment with block cutting parameters
-- maybe experiment with ValidatorPoolSize: only > no. of cores makes sense
-- maybe experiment with no tls and solo orderer (can't use main as solo has been removed)
-- Gateway request limit (I used 10000, 20000): it's good to note that on blind writes you can see the backlog of unfinished transactions being limited to 20000 but it will also register failed transactions as they are rejected
+The above was repeated using a 1000 byte asset size.
+
+- workers: 200
+- fixed-tps, tps: 1530
+
+```bash
++----------------------------------------+--------+------+-----------------+-----------------+-----------------+-----------------+------------------+
+| Name                                   | Succ   | Fail | Send Rate (TPS) | Max Latency (s) | Min Latency (s) | Avg Latency (s) | Throughput (TPS) |
+|----------------------------------------|--------|------|-----------------|-----------------|-----------------|-----------------|------------------|
+| read-write-assets-previously-read-1000 | 183800 | 0    | 1527.7          | 0.26            | 0.04            | 0.11            | 1527.0           |
++----------------------------------------+--------+------+-----------------+-----------------+-----------------+-----------------+------------------+
+```
+
+Allowing for MVCC_READ_CONFLICT validation errors
+
+- workers: 200
+- fixed-tps, tps: 1880
+
+```bash
++----------------------------------------+--------+------+-----------------+-----------------+-----------------+-----------------+------------------+
+| Name                                   | Succ   | Fail | Send Rate (TPS) | Max Latency (s) | Min Latency (s) | Avg Latency (s) | Throughput (TPS) |
+|----------------------------------------|--------|------|-----------------|-----------------|-----------------|-----------------|------------------|
+| read-write-assets-previously-read-1000 | 223719 | 2081 | 1876.8          | 7.99            | 0.37            | 5.19            | 1786.5           |
++----------------------------------------+--------+------+-----------------+-----------------+-----------------+-----------------+------------------+
+```
+
+The above results are probably at the limit of the fabric network under test and that latency is really above an acceptable threshold.
+
+## Acknowledgements
+
+I would like to thank Shivdeep Singh for running the Hyperledger Caliper benchmarks to get the results presented in this blog.
+
+Thanks also to Senthilnathan Natarajan for the initial performance investigations done on Hyperledger Fabric
+
+Finally, thanks to Dave Enyeart for reviewing and providing feedback on this blog post.
