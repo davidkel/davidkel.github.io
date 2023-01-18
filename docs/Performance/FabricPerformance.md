@@ -6,7 +6,7 @@ This article will provide an introduction into the considerations needed to impr
 
 ## Fabric Version
 
-Fabric 2.x has performance improvements over Fabric 1.4. Fabric 1.4 is now out of LTS and should not be used in production environments. Fabric 2.5 is the latest LTS version and includes the new Peer Gateway service. When used with the new gateway SDKs, applications will demonstrate improved performance relative to applications based on the legacy SDKs.
+Fabric 2.x has performance improvements over Fabric 1.4. Fabric 1.4 is now out of LTS and should not be used in production environments. Fabric 2.5 is the latest LTS version and includes the new peer Gateway service. When used with the new gateway SDKs, applications will demonstrate improved performance relative to applications based on the legacy SDKs.
 
 ## Hardware considerations
 
@@ -36,7 +36,7 @@ In general, ensure that there is a CPU core available for each channel that is r
 
 ### Total Query Limit
 
-A Peer limits the total number of records a range or JSON (rich) query will ever return. This is configured in the core.yaml file of a peer
+A peer limits the total number of records a range or JSON (rich) query will return in order to avoid runaway situations. This is configured in the core.yaml file of a peer:
 
 ```yaml
 
@@ -46,11 +46,11 @@ ledger:
     totalQueryLimit: 100000
 ```
 
-100000 is the default that Fabric provides in the sample core.yaml and in the test docker images. If you are exceeding this limit, you can increase this value but I would suggest that if you are exceeding this limit that the query is returning too many records and you should look to keeping the range within the limit
+100000 is the default that Fabric provides in the sample core.yaml and in the test docker images. If you are exceeding this limit, you can increase this value, however you should consider alternative designs that don't require such extensive query scans.
 
 ### Concurrency limits
 
-The peer has some limits to ensure a peer cannot be overwhelmed by clients:
+The peer has some limits to ensure a peer cannot be overwhelmed by excessive concurrent client requests:
 
 ```yaml
 peer:
@@ -69,11 +69,11 @@ peer:
             gatewayService: 500
 ```
 
-The new Peer Gateway service introduced a limit in the `gatewayService` and the default in the sample configuration and test docker images is 500. However this will restrict the TPS of a network so you may need to increase this value. However don't set it too high as it ensures that the peer doesn't get overloaded with requests causing the TPS to actually drop. For high throughput I used values up to 20000 for performance benchmarking.
+The new peer Gateway service introduced a limit in the `gatewayService` with a default of 500. However, this may restrict the TPS of a network so you may need to increase this value to allow more concurrent requests. Good results have been seen with 20000 concurrent requests, higher values may be counter-productive.
 
 ### CouchDB Cache setting
 
-If you are using CouchDB and have a large number of keys being read (not via queries) then you may want to investigate increasing the CouchDB cache to avoid database lookups:
+If you are using CouchDB and have a large number of keys being read repeatedly (not via queries) then you may want to increase the peer's CouchDB cache to avoid database lookups:
 
 ```yaml
 
@@ -88,7 +88,7 @@ state:
 
 ## Orderer Considerations
 
-The ordering service uses raft concensus to cut blocks, factors such as the number of orderers in concensus and block cutting parameters will affect performance
+The ordering service uses raft consensus to cut blocks, factors such as the number of orderers in consensus and block cutting parameters will affect performance.
 
 ### Number of orderers
 
@@ -113,7 +113,7 @@ A larger block size and timeout could increase the throughput (but latency would
 
 You might want to try to configure the ordering service with more transactions per block and longer block cutting times to see if that helps. We have seen this increase the overall throughput at the cost of additional latency.
 
-The following three parameters work together to control when a block is cut, based on a combination of setting the maximum number of transactions in a block as well as the block size itself. These are defined when you create or update a channel configuration. If you use configtxgen and configtx.yaml as a starting point for creating channels then the following section applies in configtx.yaml
+The following three parameters work together to control when a block is cut, based on a combination of setting the maximum number of transactions in a block as well as the block size itself. These are defined when you create or update a channel configuration. If you use configtxgen and configtx.yaml as a starting point for creating channels then the following section applies in configtx.yaml:
 
 ```yaml
 Orderer: &OrdererDefaults
@@ -157,7 +157,7 @@ Orderer: &OrdererDefaults
 
 #### Absolute max bytes
 
-Set this value to the largest block size in bytes that can be cut by the orderer. No transaction may be larger than the value of Absolute max bytes. Usually, this setting can safely be two to ten times larger than your Preferred max bytes. Note: The maximum recommended size is 49MB based on the headroom needed for the default grpc size limit of 100MB.
+Set this value to the largest block size in bytes that can be cut by the ordering service. No transaction may be larger than the value of Absolute max bytes. Usually, this setting can safely be two to ten times larger than your Preferred max bytes. Note: The maximum recommended size is 49MB based on the headroom needed for the default grpc size limit of 100MB.
 
 #### Max message count
 
@@ -171,7 +171,7 @@ Together, these parameters can be configured to optimize throughput of your orde
 
 #### Batch timeout
 
-Set the Timeout value to the amount of time, in seconds, to wait after the first transaction arrives before cutting the block. If you set this value too low, you risk preventing the batches from filling to your preferred size. Setting this value too high can cause the orderer to wait for blocks and overall performance to degrade. In general, we recommend that you set the value of Batch timeout to be at least max message count / maximum transactions per second
+Set the Timeout value to the amount of time, in seconds, to wait after the first transaction arrives before cutting the block. If you set this value too low, you risk preventing the batches from filling to your preferred size. Setting this value too high can cause the orderer to wait for blocks and overall performance and latency to degrade. In general, we recommend that you set the value of Batch timeout to be at least max message count / maximum transactions per second.
 
 ## Application Considerations
 
@@ -179,31 +179,29 @@ When designing the application architecture, decisions can affect the overall pe
 
 ### Avoid CouchDB for high throughput applications
 
-CouchDB performance is noticably slower than embedded LevelDB sometimes by a factor of 2x slower. The only capability that you get by choosing CouchDB is JSON (rich) queries as stated in the [Fabric state database documentation](https://hyperledger-Fabric.readthedocs.io/en/release-2.5/deploypeer/peerplan.html#state-database). You should also never allow direct access to the CouchDB data (for instance via Fauxton UI) to ensure the integrity of the state data.
+CouchDB performance is noticably slower than embedded LevelDB, sometimes by a factor of 2x slower. The only additional capability that a CouchDB state database provides is JSON (rich) queries as stated in the [Fabric state database documentation](https://hyperledger-Fabric.readthedocs.io/en/release-2.5/deploypeer/peerplan.html#state-database). You should also never allow direct access to the CouchDB data (for instance via Fauxton UI) to ensure the integrity of the state data.
 
-CouchDB also has other limitations which will have impacts on performance, extra hardware resource required to provide CouchDB for each peer (which incurs additional costs) and no extra protection from Fabric (JSON queries are not re-executed at validation time and thus you don't get any Phantom Protection from Fabric as you do with range queries).
+CouchDB as a state database also has other limitations which will have impacts on performance and requires additional hardware resource (and cost). Additionally, JSON queries are not re-executed at validation time and thus there is no built-in protection from phantom reads as there is with range queries (your application must be designed to tolerate phantom reads when using JSON queries, for example when records are added to state between the time of chaincode execution and block validation). For these reasons, consider using range queries based on additional keys rather than CouchDB JSON queries.
 
-If at all possible consider looking at an off-chain store to support queries for which Fabric provides a sample [Off-chain sample](https://github.com/hyperledger/Fabric-samples/tree/main/off_chain_data) to demonstrate exactly this. Doing so gives you much more control over the data and query transactions do not affect the Fabric network performance. It also enables you to use a fit-for-purpose data store for off-chain storage, for example you could use a SQL database or an analytics service depending on your query needs.
+Alternatively, consider using an off-chain store to support queries, as seen in the [Off-chain sample](https://github.com/hyperledger/Fabric-samples/tree/main/off_chain_data). Using an off-chain store for queries gives you much more control over the data and query transactions do not affect the Fabric peer and network performance. It also enables you to use a fit-for-purpose data store for off-chain storage, for example you could use a SQL database or an analytics service more aligned with your query needs.
 
 CouchDB performance degrades more than LevelDB as the amount of state data increases, requiring you to provide adequate resources for CouchDB instances for the life of the application.
 
 ### Use the new Peer Gateway Service
 
-The Peer Gateway Service and the new Fabric-Gateway client SDKs are a substantial improvement over the legacy Go, Java and Node SDKs. Not only do they provide much improved throughput, they also provide better capability reducing the complexity of a client application. For example the Gateway SDKs will automatically collect enough endorsements to satisfy not only the chaincode endorsement policy but also any state-based endorsement policies that get included when the transaction is simulated, something that was not possible with the legacy SDKs.
+The peer Gateway Service and the new Fabric-Gateway client SDKs are a substantial improvement over the legacy Go, Java and Node SDKs. Not only do they provide much improved throughput, they also provide better capability reducing the complexity of a client application. For example the Gateway SDKs will automatically collect enough endorsements to satisfy not only the chaincode endorsement policy but also any state-based endorsement policies that get included when the transaction is simulated, something that was not possible with the legacy SDKs.
 
 It also reduces the number of network connections a client needs to maintain in order for a client to submit a transaction. Previously clients may need to connect to multiple peer and orderer nodes across organizations. The peer Gateway Service service enables an application to target a single trusted peer, then the peer Gateway Service connects to other peer and orderer nodes to gather endorsements and submit the transaction on behalf of the client application. Of course, you may want to target multiple trusted peers for high concurrency and redundancy.
 
-One point to remember that if you used the legacy SDKs then a client requires more CPU and memory than a client using the new Peer Gateway service so this reduces the client resource requirements. However, it does increase the peer resource requirements slightly.
+One point to consider is that shifting from legacy SDKs to the new Peer Gateway service reduces the client CPU and memory resource requirements. However, it does increase the peer resource requirements slightly.
 
-See https://github.com/hyperledger/Fabric-samples/blob/main/full-stack-asset-transfer-guide/docs/ApplicationDev/01-FabricGateway.md
-
-for information about how the Peer Gateway Service differs from the legacy SDKs.
+See the [Sample gateway application](https://github.com/hyperledger/Fabric-samples/blob/main/full-stack-asset-transfer-guide/docs/ApplicationDev/01-FabricGateway.md) for more details about the new peer Gateway Service.
 
 ### Payload size
 
 The amount of data that is submitted to a transaction, along with the amount of data written to keys in a transaction will affect the application performance. Note that the payload size includes more than just the data. It includes structures required by Fabric plus client and endorsing peer signatures.
 
-Suffice to say large payload sizes are an anti-pattern in any blockchain solution. Considering storing large data off-chain and storing a hash of the data on-chain.
+Suffice to say large payload sizes are an anti-pattern in any blockchain solution. Consider storing large data off-chain and storing a hash of the data on-chain.
 
 ### Chaincode language
 
@@ -211,7 +209,7 @@ Go chaincode performs best, followed by Node chaincode.  Java chaincode performa
 
 ### Node chaincode
 
-Node is an asynchronous runtime implementation that utilises only a single thread to execute code. It does however run background threads for activities such as garbage collection, however when allocating resources to a Node chaincode, for example in Kubernetes where you are limited to available resources, it doesn't make sense to allocate multiple vCPUS for Node chaincode. The number of vCPUs in a system usually refers to the number of concurrent threads that can be executed so it's worth monitoring performance of Node chaincode to see how much vCPU it uses but it probably doesn't make sense to allocate anything more than a max of 2 vCPUs for Node chaincode. In fact you could not assign any resource restrictions to Node chaincode as it is self limiting.
+Node is an asynchronous runtime implementation that utilises only a single thread to execute code. It does however run background threads for activities such as garbage collection, however when allocating resources to a Node chaincode, for example in Kubernetes where you are limited to available resources, it doesn't make sense to allocate multiple vCPUs for Node chaincode. The number of vCPUs in a system usually refers to the number of concurrent threads that can be executed. It is worth monitoring performance of Node chaincode to see how much vCPU it uses but it probably doesn't make sense to allocate anything more than a max of 2 vCPUs for Node chaincode. In fact you could not assign any resource restrictions to Node chaincode as it is self limiting.
 
 Prior to Node 12, a Node process was limited to 1.5Gb Memory by default and would require you to pass a parameter to the Node executable in order to increase this when running a node chaincode process. You should not be running Node chaincode processes on anything less than Node 12 now and Hyperledger Fabric 2.5 mandates that Node 16 or later should be used. There are various parameters that can be provided to the Node process when you launch your Node chaincode, however it's unlikely you would ever need to override the defaults of Node so no tuning would be required.
 
@@ -225,7 +223,7 @@ Hyperledger Fabric will reuse chaincode processes across channels if the chainco
 
 ### Endorsement policies
 
-For a transaction to be committed as valid, one of the things it must contain is enough signatures to satisfy the chaincode endorsement policy and any state-based endorsement policies. The Peer Gateway service will only send requests to enough peers to satisfy this collection of policies (and will also try other peers if the preferred ones are not available). Thus we can see that endorsement policies will affect performance as it dictates how many peers and thus how many signatures are required to ensure this transaction could be committed.
+For a transaction to be committed as valid, it must contain enough signatures to satisfy the chaincode endorsement policy and any state-based endorsement policies. The peer Gateway service will only send requests to enough peers to satisfy this collection of policies (and will also try other peers if the preferred ones are not available). Thus we can see that endorsement policies will affect performance as it dictates how many peers and thus how many signatures are required to ensure that a transaction can be committed.
 
 ## Couchdb considerations
 
@@ -245,9 +243,9 @@ See `CouchDB Cache setting` in the Peer Considerations section for information o
 
 ### Indexes
 
-Ensure you use indexes and don't use queries that can't use indexes. For example use of the query operators $or, $in, $regex result in full data scans. See [Hyperledger Fabric Good Practive For Queries](https://hyperledger-Fabric.readthedocs.io/en/release-2.5/couchdb_as_state_database.html?highlight=%24regex#good-practices-for-queries)
+Ensure you use indexes and don't use queries that can't use indexes. For example use of the query operators $or, $in, $regex result in full data scans. See [Hyperledger Fabric Good Practices For Queries](https://hyperledger-fabric.readthedocs.io/en/release-2.5/couchdb_as_state_database.html#good-practices-for-queries)
 
-Optimise your queries, complex queries will take more time even with indexing and ensure your queries result in a bounded set of data. Remember Fabric may also limit the total number of results returned.
+Optimise your queries, complex queries will take more time even with indexing. Ensure your queries result in a bounded set of data. Remember Fabric may also limit the total number of results returned.
 
 You can check peer and CouchDB logs to see how long queries are taking and also whether a query was unable to use an index from warning log entries stating the query "should be indexed".
 
@@ -261,7 +259,7 @@ Fabric uses bulk update calls to CouchDB to improve CouchDB performance. A bulk 
 
 ## HSM
 
-using HSMs within a Fabric network will have an impact on performance. It's not possible to quantify the impact here but things like the performance of the HSM and the network connection to the HSM will impact the Fabric network.
+Using HSMs within a Fabric network will have an impact on performance. It's not possible to quantify the impact here but things like the performance of the HSM and the network connection to the HSM will impact the Fabric network.
 
 If you have configured Peers, Orderers, Clients to use an HSM then anything that requires signing such as blocks by orderers, endorsements and block events by peers and all client requests will be done by the HSM so you can see that the HSM is involved in all the major activities that the nodes perform.
 
@@ -271,9 +269,9 @@ HSMs are NOT involved in the verification of signatures. This is still done by t
 
 Sending single transactions periodically will have a latency correlating to the block cutting parameters. For example if you send a transaction of 100 Bytes and the BatchTimeout is 2 seconds then the time from submission to being committed will be just over 2 seconds. This is not a true benchmark of your Fabric network performance, it's expected that multiple transactions will be submitted simultaneously to gauge the true performance of a Fabric network.
 
-## Performance runs
+## Performance benchmarks
 
-The following describes some initial performance runs on Hyperledger Fabric 2.5 builds
+The following describes some initial performance benchmarks on Hyperledger Fabric 2.5 builds.
 
 ### Hardware and Topology
 
@@ -291,26 +289,26 @@ Each node had the same identical hardware
 
 The machines were all on the same switch.
 
-Hyperledger Fabric was deployed natively to 3 physical machines (ie the native binaries were installed and executed, no container technology such as Docker or Kubernetes was used)
+Hyperledger Fabric was deployed natively to 3 physical machines (ie the native binaries were installed and executed, no container technology such as Docker or Kubernetes was used).
 
 ### Fabric Application Configuration
 
 - LevelDB was used for the state database
 - Gateway Service Concurrency limit was set to 20,000
 - A single application channel was created and the 2 peers and orderer were joined to this channel
-  - The application capabilities were set to V1_4 so as to use the old lifecycle deployment. all other capabilities were set to V2_0
+  - The application capabilities were set to V1_4 so as to use the old lifecycle deployment. All other capabilities were set to V2_0 (capability level should not impact performance).
 - No system channel exists only the application channel
 - Go chaincode without the Contract API was deployed (fixed-asset-base from hyperledger Caliper-Benchmarks)
 - Endorsement policy 1 Of Any was specified for the chaincode
 - No private data was used
-- Standard OOTB Fabric Policies and configurations (note that in 2.5 SendBufferSize now defaults to 100) excluding anything previously mentioned
-- No tests were done that included Range Queries (and obviously no JSON Queries)
+- Default Fabric policies and configurations (note that in 2.5 SendBufferSize now defaults to 100) excluding anything previously mentioned
+- No range queries or JSON queries
 
 ### Load Generator
 
-Hyperledger Caliper 0.5.0 was used as the load generator and for the report output. Caliper was bound to `Fabric:2.4` which means it used the Peer Gateway Service to invoke and evaluate transactions.
+Hyperledger Caliper 0.5.0 was used as the load generator and for the report output. Caliper was bound to `Fabric:2.4` which means it used the peer Gateway Service to invoke and evaluate transactions.
 
-The load itself was defined from fixed-asset in Hyperledger Caliper-Benchmarks
+The load itself was defined from fixed-asset in Hyperledger Caliper-Benchmarks.
 
 Caliper used 4 bare metal machines to host remote caliper workers and also to host a single caliper manager to generate the load on the Hyperledger Fabric Network.
 
@@ -320,7 +318,7 @@ Caliper used 4 bare metal machines to host remote caliper workers and also to ho
 
 ### Results
 
-These results were generated against the latest builds of Hyperledger Fabric 2.5 and the utilised the default values of fabric that exist within the sampleconfig directory of the fabric source code. Specifically the following block cutting parameters were used.
+These results were generated against the latest builds of Hyperledger Fabric 2.5 and utilised the [default node and channel config values](https://github.com/hyperledger/fabric/tree/release-2.5/sampleconfig). Specifically the following block cutting parameters were used:
 
 - block_cut_time: 2s
 - block_size: 500
@@ -328,16 +326,18 @@ These results were generated against the latest builds of Hyperledger Fabric 2.5
 
 In order to be able to push enough workload through without hitting concurrency limits, the gateway concurrency limit was set to 20,000.
 
-In summary the following benchmarks are presented here
+In summary the following benchmarks are presented here:
 
 - Blind write of a single key with 100 Byte Asset Size (a create asset benchmark)
 - Blind write of a single key with 1000 Byte Asset Size (a create asset benchmark)
 - Read/Write of a single key with 100 Byte Asset Size (an update asset benchmark)
+- Read/Write of a single key with 1000 Byte Asset Size (an update asset benchmark)
 
 #### Blind Write of a single key 100 Byte Asset Size
 
-A Blind write is a transaction that performs a single write to a key regardless of whether that key exists and contains data. This is a `Create Asset` type of scenario
+A Blind write is a transaction that performs a single write to a key regardless of whether that key exists and contains data. This is a `Create Asset` type of scenario.
 
+Caliper test configuration:
 - workers: 200
 - fixed-tps, tps: 3000
 
@@ -351,6 +351,7 @@ A Blind write is a transaction that performs a single write to a key regardless 
 
 #### Blind Write of a single key 1000 Byte Asset Size
 
+Caliper test configuration:
 - workers: 200
 - fixed-tps, tps: 3000
 
@@ -366,8 +367,9 @@ Here we see that we can achieve roughly the same throughput but latency increase
 
 #### Read Write of a single key 100 Byte Asset Size
 
-This is a test where the transaction will randomly pick an already existing key with data, read it, then modify that key. The world state was loaded with 1 million assets for this test to reduce the chance of getting MVCC_READ_CONFLICT validation errors. In this example the TPS rate was low enough and fortunate that no MVCC_READ_CONFLICT validation errors were received.
+This is a test where the transaction will randomly pick an already existing key with data, read it, then modify that key. The world state was loaded with 1 million assets for this test to reduce the chance of using the same key in two concurrent transactions resulting in MVCC_READ_CONFLICT validation errors. In this example the TPS rate was low enough and fortunate that no MVCC_READ_CONFLICT validation errors were received.
 
+Caliper test configuration:
 - workers: 200
 - fixed-tps, tps: 2550
 
@@ -379,23 +381,11 @@ This is a test where the transaction will randomly pick an already existing key 
 +---------------------------------------+--------+------+-----------------+-----------------+-----------------+-----------------+------------------+
 ```
 
-MVCC_READ_CONFLICT validation errors are an acceptable error for this test due to the randomness of selecting an asset there is always a chance that it can occur. An MVCC_READ_CONFLICT is generated at block validation time in the peer, but the block is still committed to the blockchain the only difference is the transaction is marked as invalid and no world state update takes place for that transaction. It would be reasonable for a client application to perhaps resubmit that transaction using some policy (however this isn't what the workloads for caliper do). As these errors are acceptable we can look at the maximum TPS where these errors occur.
-
-- workers: 200
-- fixed-tps, tps: 2750
-
-```bash
-+---------------------------------------+--------+------+-----------------+-----------------+-----------------+-----------------+------------------+
-| Name                                  | Succ   | Fail | Send Rate (TPS) | Max Latency (s) | Min Latency (s) | Avg Latency (s) | Throughput (TPS) |
-|---------------------------------------|--------|------|-----------------|-----------------|-----------------|-----------------|------------------|
-| read-write-assets-previously-read-100 | 328815 | 1385 | 2744.8          | 3.80            | 0.05            | 1.59            | 2664.0           |
-+---------------------------------------+--------+------+-----------------+-----------------+-----------------+-----------------+------------------+
-```
-
 #### Read Write of a single key 1000 Byte Asset Size
 
 The above was repeated using a 1000 byte asset size.
 
+Caliper test configuration:
 - workers: 200
 - fixed-tps, tps: 1530
 
@@ -407,25 +397,12 @@ The above was repeated using a 1000 byte asset size.
 +----------------------------------------+--------+------+-----------------+-----------------+-----------------+-----------------+------------------+
 ```
 
-Allowing for MVCC_READ_CONFLICT validation errors
-
-- workers: 200
-- fixed-tps, tps: 1880
-
-```bash
-+----------------------------------------+--------+------+-----------------+-----------------+-----------------+-----------------+------------------+
-| Name                                   | Succ   | Fail | Send Rate (TPS) | Max Latency (s) | Min Latency (s) | Avg Latency (s) | Throughput (TPS) |
-|----------------------------------------|--------|------|-----------------|-----------------|-----------------|-----------------|------------------|
-| read-write-assets-previously-read-1000 | 223719 | 2081 | 1876.8          | 7.99            | 0.37            | 5.19            | 1786.5           |
-+----------------------------------------+--------+------+-----------------+-----------------+-----------------+-----------------+------------------+
-```
-
 The above results are probably at the limit of the fabric network under test and that latency is really above an acceptable threshold.
 
 ## Acknowledgements
 
 I would like to thank Shivdeep Singh for running the Hyperledger Caliper benchmarks to get the results presented in this blog.
 
-Thanks also to Senthilnathan Natarajan for the initial performance investigations done on Hyperledger Fabric
+Thanks also to Senthilnathan Natarajan for the initial performance investigations done on Hyperledger Fabric.
 
 Finally, thanks to Dave Enyeart for reviewing and providing feedback on this blog post.
