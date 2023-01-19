@@ -306,7 +306,7 @@ Hyperledger Fabric was deployed natively to 3 physical machines (ie the native b
 
 ### Load Generator
 
-Hyperledger Caliper 0.5.0 was used as the load generator and for the report output. Caliper was bound to `Fabric:2.4` which means it used the peer Gateway Service to invoke and evaluate transactions.
+Hyperledger Caliper 0.5.0 was used as the load generator and for the report output. Caliper was bound to `Fabric:2.4` which means it used the peer Gateway Service to invoke and evaluate transactions. All transactions were generated from the same organisation to it's gateway peer.
 
 The load itself was defined from fixed-asset in Hyperledger Caliper-Benchmarks.
 
@@ -338,6 +338,7 @@ In summary the following benchmarks are presented here:
 A Blind write is a transaction that performs a single write to a key regardless of whether that key exists and contains data. This is a `Create Asset` type of scenario.
 
 Caliper test configuration:
+
 - workers: 200
 - fixed-tps, tps: 3000
 
@@ -352,6 +353,7 @@ Caliper test configuration:
 #### Blind Write of a single key 1000 Byte Asset Size
 
 Caliper test configuration:
+
 - workers: 200
 - fixed-tps, tps: 3000
 
@@ -370,6 +372,7 @@ Here we see that we can achieve roughly the same throughput but latency increase
 This is a test where the transaction will randomly pick an already existing key with data, read it, then modify that key. The world state was loaded with 1 million assets for this test to reduce the chance of using the same key in two concurrent transactions resulting in MVCC_READ_CONFLICT validation errors. In this example the TPS rate was low enough and fortunate that no MVCC_READ_CONFLICT validation errors were received.
 
 Caliper test configuration:
+
 - workers: 200
 - fixed-tps, tps: 2550
 
@@ -386,6 +389,7 @@ Caliper test configuration:
 The above was repeated using a 1000 byte asset size.
 
 Caliper test configuration:
+
 - workers: 200
 - fixed-tps, tps: 1530
 
