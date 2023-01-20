@@ -225,6 +225,10 @@ Hyperledger Fabric will reuse chaincode processes across channels if the chainco
 
 For a transaction to be committed as valid, it must contain enough signatures to satisfy the chaincode endorsement policy and any state-based endorsement policies. The peer Gateway service will only send requests to enough peers to satisfy this collection of policies (and will also try other peers if the preferred ones are not available). Thus we can see that endorsement policies will affect performance as it dictates how many peers and thus how many signatures are required to ensure that a transaction can be committed.
 
+### Private Data Collections (PDCs) vs World State
+
+In general the decision whether or not to use PDC's (Private Data Collections) will be an application architecture decision rather than a performance decision but for awareness it should be noted that, for example, using a PDC to store an asset verses using the world state (shown in the benchmarks later) will result in approximately half the TPS.
+
 ## Couchdb considerations
 
 As mentioned earlier CouchDB is not recommended for high throughput applications, but if you do plan to use it these are the things that need to be considered.
@@ -384,6 +388,8 @@ Caliper test configuration:
 +---------------------------------------+--------+------+-----------------+-----------------+-----------------+-----------------+------------------+
 ```
 
+Note that the above results were done to with an expectation of no failures. We see that the fabric network was not reaching capacity in this test as latency remains very low.
+
 #### Read Write of a single key 1000 Byte Asset Size
 
 The above was repeated using a 1000 byte asset size.
@@ -401,7 +407,8 @@ Caliper test configuration:
 +----------------------------------------+--------+------+-----------------+-----------------+-----------------+-----------------+------------------+
 ```
 
-The above results are probably at the limit of the fabric network under test and that latency is really above an acceptable threshold.
+Note that the above results were done to with an expectation of no failures. We see that the fabric network was not reaching capacity in this test as latency remains very low.
+
 
 ## Acknowledgements
 
