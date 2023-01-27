@@ -12,9 +12,15 @@ Fabric 2.x has performance improvements over Fabric 1.4. Fabric 1.4 is now out o
 
 Each organisation may provide it's own hardware to host their peer nodes and ordering service nodes. Ordering service nodes may be provided by a single organisation, or may be contributed from various organisations. It's important to realise that individual organisations could impact the whole network (depending on policies such as endorsement policies), therefore each organisation must ensure that they provide adequate resources for the services they deploy.
 
-As Hyperledger Fabric performs a lot of disk I/O it goes without saying that you should ensure you are using the fastest disk storage available to you and that the physical drive it ultimately resides on should be SSD.
+### Persistent Storage
+
+As Hyperledger Fabric performs a lot of disk I/O it goes without saying that you should ensure you are using the fastest disk storage available to you and that the physical drive it ultimately resides on should be SSD. If you are using network attached storage then ensure that you choose the fastest IOPs available.
+
+### Network connectivity
 
 A Hyperledger Fabric network is highly distributed across multiple nodes usually hosted on multiple different clusters, on different clouds and even in different countries, therefore high speed network connectivity between nodes is vital and at least 1Gbs should be deployed between all nodes/organisations.
+
+### CPU and Memory
 
 The final piece is how much CPU and Memory should be allocated to peer and ordering service nodes, and if used for peer nodes, CouchDB state databases. There is no real answer to this one but it does affect the performance of the network and even the stability of the nodes if not enough resources are allocated. It's vital therefore that you constantly monitor the CPU, Memory, Disk Space, Disk and Network IO to ensure that you are within the limits of your allocated resources. Do not wait until you see these values consistently hitting 99% utilization before deciding to increase the resources.  A threshold of between 70% and 80% is a good starting point for the maximum expected workload.
 
@@ -22,11 +28,18 @@ Performance generally scales with CPU allocated to peer nodes. Providing each pe
 
 As the amount of state data grows the database storage may slow down, especially when using CouchDB as the state database. Therefore you may need to add more compute resource to the environment over the life of your Fabric deployment, which just re-emphasises the point that you must monitor your network components and react to any thresholds being exceeded.
 
-## Peer Configuration Considerations
+## Peer Considerations
 
 Although covered later it is important to note that using CouchDB for the state database will have a noticeable impact on performance. Refer to the CouchDB considerations section later for more information.
 
 This section highlights some of the considerations for a peer such as the number of active channels and node configuration properties. The default peer and orderer configurations from the peer core.yaml and orderer orderer.yaml are referenced below.
+
+### Number of Peers
+
+In theory the more peers organisations have, the better the network will perform. From an endorsement point of view this isn't necessarily going to be the case. Gateway peers selects peers for endorsement based on their known current block height so distribution among eligible peers for endorsement is not easily predictable.
+What is predictable is the use of gateway peers. An organisation can reduce the work done by a single gateway peer by having more than one gateway peer and then selecting a gateway peer to submit or evaluate a transaction based on some defined policy such as round robin. This selecting of a gateway peer could be done via a load balancer, coded into the client application or maybe use the capabilities of the grpc library used to provide gateway selection.
+
+Neither of these scenarios have been formally benchmarked to see if performance gains can be made.
 
 ### Number of channels a peer is participating in
 
@@ -229,6 +242,10 @@ For a transaction to be committed as valid, it must contain enough signatures to
 
 In general the decision whether or not to use PDC's (Private Data Collections) will be an application architecture decision rather than a performance decision but for awareness it should be noted that, for example, using a PDC to store an asset verses using the world state (shown in the benchmarks later) will result in approximately half the TPS.
 
+### Single channel vs Multiple channel architecture
+
+When designing your application, consideration should be given to whether a single channel or multiple channels can be utilised. If data silos are not a problem for a given application scenario, The application could be architected to use multiple channels to improve the performance as previously mentioned it possible to utilise more of the peer resource if more than one channel is active.
+
 ## Couchdb considerations
 
 As mentioned earlier CouchDB is not recommended for high throughput applications, but if you do plan to use it these are the things that need to be considered.
@@ -307,6 +324,7 @@ Hyperledger Fabric was deployed natively to 3 physical machines (ie the native b
 - No private data was used
 - Default Fabric policies and configurations (note that in 2.5 SendBufferSize now defaults to 100) excluding anything previously mentioned
 - No range queries or JSON queries
+- The network was enabled for TLS, but not mutual TLS
 
 ### Load Generator
 
@@ -314,7 +332,7 @@ Hyperledger Caliper 0.5.0 was used as the load generator and for the report outp
 
 The load itself was defined from fixed-asset in Hyperledger Caliper-Benchmarks.
 
-Caliper used 4 bare metal machines to host remote caliper workers and also to host a single caliper manager to generate the load on the Hyperledger Fabric Network.
+Caliper used 4 bare metal machines to host remote caliper workers and also to host a single caliper manager to generate the load on the Hyperledger Fabric Network. In order to generate enough workload on the fabric network we have to use multiple caliper workers which equate to the number of current clients connecting to the network. In the results section, the number of caliper workers is provided.
 
 ### Diagram of overall Topology
 
@@ -337,6 +355,14 @@ In summary the following benchmarks are presented here:
 - Read/Write of a single key with 100 Byte Asset Size (an update asset benchmark)
 - Read/Write of a single key with 1000 Byte Asset Size (an update asset benchmark)
 
+The following should also be noted
+
+- Only a single channel is used and thus the peer doesn't utilise it's full resources (as described earlier a peer can achieve more throughput if more than one channel is utlised).
+- The chaincode is optimised for these tests. Real world chaincode will not be as performant.
+- The caliper workload generator is also optimised for pushing transactions. Real world applications will also have a client implementation generating the workload which will introduce some latency.
+- The caliper workload generator is sending transactions to a single gateway peer on the same organisation. Real world applications are likely to have multiple organisations sending transactions concurrently. There is the potential for higher TPS results if the workload is sent to from multiple organisations rather than just the same organisation.
+- Utilising the gateway service means that blocks are not received by the client (caliper) via the delivery service to determine whether a transaction has completed, improving the performance of the client and the network compared to using the legacy node SDK.
+
 #### Blind Write of a single key 100 Byte Asset Size
 
 A Blind write is a transaction that performs a single write to a key regardless of whether that key exists and contains data. This is a `Create Asset` type of scenario.
@@ -354,6 +380,8 @@ Caliper test configuration:
 +------------------+--------+------+-----------------+-----------------+-----------------+-----------------+------------------+
 ```
 
+The TPS here is the peak. Trying to push beyond this resulted in unexpected failures and a drop in overall throughput.
+
 #### Blind Write of a single key 1000 Byte Asset Size
 
 Caliper test configuration:
@@ -369,7 +397,7 @@ Caliper test configuration:
 +------------------+--------+------+-----------------+-----------------+-----------------+-----------------+------------------+
 ```
 
-Here we see that we can achieve roughly the same throughput but latency increases.
+Here we see that we can achieve roughly the same throughput (ie the peak) but latency increases.
 
 #### Read Write of a single key 100 Byte Asset Size
 
@@ -408,7 +436,6 @@ Caliper test configuration:
 ```
 
 Note that the above results were done to with an expectation of no failures. We see that the fabric network was not reaching capacity in this test as latency remains very low.
-
 
 ## Acknowledgements
 
