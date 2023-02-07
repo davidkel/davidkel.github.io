@@ -9,6 +9,7 @@
 
 - [Hyperledger Fabric: Notes about developing apps for Hyperledger Fabric](./docs/FabricDeveloper/TOC.md)
 - [Hyperledger Fabric: Performance overview](./docs/Performance/FabricPerformance.md)
+- [Hyperledger Fabric: Performance Blog](./docs/Performance/FabricPerformanceBlog.md)
 
 # IBM Blockchain Platform VSCode extension (Archived)
 
