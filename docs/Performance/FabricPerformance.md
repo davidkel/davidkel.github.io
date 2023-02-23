@@ -200,6 +200,10 @@ Alternatively, consider using an off-chain store to support queries, as seen in 
 
 CouchDB performance degrades more than LevelDB as the amount of state data increases, requiring you to provide adequate resources for CouchDB instances for the life of the application.
 
+### General chaincode query considerations
+
+Avoid writing queries that could be unbounded in the amount of data returned, and even if it's bounded if it's likely to return a large amount of data then this will cause a transaction to run for a long time and possibly time out. It's not best practice for fabric transactions to run for a long time, so ensure your queries are optimised to not return large amounts of data and if JSON queries are used ensure they are indexed. See [Good practice for queries](https://hyperledger-fabric.readthedocs.io/en/release-2.5/couchdb_as_state_database.html#good-practices-for-queries) for guidance on JSON queries.
+
 ### Use the new Peer Gateway Service
 
 The peer Gateway Service and the new Fabric-Gateway client SDKs are a substantial improvement over the legacy Go, Java and Node SDKs. Not only do they provide much improved throughput, they also provide better capability reducing the complexity of a client application. For example the Gateway SDKs will automatically collect enough endorsements to satisfy not only the chaincode endorsement policy but also any state-based endorsement policies that get included when the transaction is simulated, something that was not possible with the legacy SDKs.
